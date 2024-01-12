@@ -1,1 +1,1 @@
-# chess
+Chess project by Darren S
