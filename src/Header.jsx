@@ -11,8 +11,8 @@ export default function Header() {
         marginBottom: 2
       }}
     >
-      <Typography fontSize={40} margin="0 10px">
-        Ultimate Chess RPG
+      <Typography fontSize={40} margin="0 10px" component="h1">
+        Chess
       </Typography>
       <Stack direction="row" spacing={4}
         sx={{
