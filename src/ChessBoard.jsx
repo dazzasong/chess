@@ -1,60 +1,32 @@
 import { Box, Stack, Typography } from "@mui/material"
 
-function ChessSquare({ isBlack, xCoordinates, yCoordinates }) {
+function ChessSquare({ x, y }) {
+  const shaded = (x + y) % 2 === 0
   return (
     <Stack
-      bgcolor={isBlack ? "darkgoldenrod" : "burlywood"}
+      bgcolor={shaded ? "darkgoldenrod" : "burlywood"}
       justifyContent="space-between"
       width={80}
       height={80}
     >
-      <Typography fontWeight="bold">{yCoordinates}</Typography>
-      <Typography fontWeight="bold" alignSelf="end">{xCoordinates}</Typography>
+      <Typography fontWeight="bold">{x === 0 ? y + 1 : null}</Typography>
+      <Typography fontWeight="bold" alignSelf="end">{y === 0 ? String.fromCharCode(x + 97) : null}</Typography>
     </Stack>
   )
 }
 
-function ChessColumn({ alternate, hasYCoordinates, xAxis }) {
-  if (alternate) {
-    return (
-      <Box>
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 8 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 7 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 6 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 5 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 4 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 3 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 2 : null} />
-        <ChessSquare xCoordinates={xAxis} yCoordinates={hasYCoordinates ? 1 : null} />
-      </Box>
-    )
-  } else {
-    return (
-      <Box>
-        <ChessSquare yCoordinates={hasYCoordinates ? 8 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 7 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 6 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 5 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 4 : null} />
-        <ChessSquare isBlack yCoordinates={hasYCoordinates ? 3 : null} />
-        <ChessSquare yCoordinates={hasYCoordinates ? 2 : null} />
-        <ChessSquare isBlack xCoordinates={xAxis} yCoordinates={hasYCoordinates ? 1 : null} />
-      </Box>
-    )
-  }
+function ChessColumn({ xAxis }) {
+  return (
+    <Stack direction="column-reverse">
+      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} />)}
+    </Stack>
+  )
 }
 
 export default function ChessBoard() {
   return (
     <Stack direction="row">
-      <ChessColumn hasYCoordinates xAxis="a" />
-      <ChessColumn alternate xAxis="b" />
-      <ChessColumn xAxis="c" />
-      <ChessColumn alternate xAxis="d" />
-      <ChessColumn xAxis="e" />
-      <ChessColumn alternate xAxis="f" />
-      <ChessColumn xAxis="g" />
-      <ChessColumn alternate xAxis="h" />
+      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} />)}
     </Stack>
   )
 }

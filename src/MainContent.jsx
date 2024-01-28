@@ -1,4 +1,5 @@
-import { Button, Stack, darken } from "@mui/material";
+import { Button, IconButton, Stack, darken } from "@mui/material";
+import SettingsIcon from '@mui/icons-material/Settings';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -54,6 +55,9 @@ export default function MainContent() {
         </Button>
         <ChessBoard />
       </Stack>
+      <IconButton>
+        <SettingsIcon fontSize="large" />
+      </IconButton>
     </div>
   )
 }
