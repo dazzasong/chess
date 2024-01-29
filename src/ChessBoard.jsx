@@ -38,7 +38,7 @@ function ChessColumn({ xAxis }) {
 
 export default function ChessBoard() {
   return (
-    <Stack direction="row">
+    <Stack direction="row" boxShadow={10}>
       {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} />)}
     </Stack>
   )
