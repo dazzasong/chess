@@ -1,5 +1,5 @@
-import { Stack, Typography } from "@mui/material";
-import React from "react";
+import { Link, Stack, Typography } from "@mui/material";
+import React from 'react';
 
 export default function Header() {
   return (
@@ -11,15 +11,16 @@ export default function Header() {
         marginBottom: 2
       }}
     >
-      <Typography fontSize={40} margin="0 10px" component="h1">
-        Chess
-      </Typography>
-      <Stack direction="row" spacing={4}
+      <Typography fontSize={40} margin="0 10px" component="h1"
         sx={{
-          margin: "0 20px"
+          userSelect: "none"
         }}
       >
-      </Stack>
+        Chess
+      </Typography>
+      <Link href="#" underline="none" color="inherit">
+        How to play
+      </Link>
     </Stack>
   )
 }
