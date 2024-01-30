@@ -11,14 +11,14 @@ export default function Header() {
         marginBottom: 2
       }}
     >
-      <Typography fontSize={40} margin="0 10px" component="h1"
+      <Typography fontSize={40} component="h1" ml={2}
         sx={{
           userSelect: "none"
         }}
       >
         Chess
       </Typography>
-      <Link href="#" underline="none" color="inherit">
+      <Link href="#" underline="none" color="inherit" mr={2}>
         How to play
       </Link>
     </Stack>

@@ -1,6 +1,10 @@
 import { FormControlLabel, FormGroup, Stack, Switch, Typography } from "@mui/material";
 
 export default function Settings() {
+  let flipBoard
+  let showLegalMoves
+  let enableSounds
+
   return (
     <Stack width={250} height={300} alignItems="center" bgcolor="gray">
       <Typography fontSize={25} fontWeight="bold">
