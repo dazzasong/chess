@@ -1,18 +1,11 @@
 import { Stack } from "@mui/material";
 
-function MoveColumn({ team }) {
-  return (
-    <Stack bgcolor="black">
-
-    </Stack>
-  )
-}
 export default function MoveList() {
-  let moves = []; // Even = white, odd = black
+  let moves = [];
 
   return (
-    <Stack>
-      {Array.from(Array(moves).keys()).map(move => <MoveBox />)}
+    <Stack direction="row" bgcolor="black">
+      {Array.from(moves.keys()).map(moves => )}
     </Stack>
   )
 }
