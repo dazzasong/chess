@@ -13,7 +13,7 @@ import whiteKing from "./images/chesspieces/kl.png";
 import blackKing from "./images/chesspieces/kd.png";
 import React from "react";
 
-function ChessSquare({ x, y, piece, selected }) {
+function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
   const shaded = (x + y) % 2 === 0
   let src
   let bgcolor
@@ -63,7 +63,7 @@ function ChessSquare({ x, y, piece, selected }) {
     bgcolor = "burlywood"
   }
   if (selected) {
-    bgcolor = "yellow"
+    bgcolor = "#ffff66"
   }
 
   return (
@@ -82,9 +82,15 @@ function ChessSquare({ x, y, piece, selected }) {
         {x === 0 ? y + 1 : null}
       </Typography>
       { src && 
-      <Box sx={{position: "absolute"}}>
-        <img src={src} alt="Chess piece" />
-      </Box>
+        <Box sx={{position: "absolute"}}>
+          <img src={src} alt="Chess piece" onClick={() => {
+            if (selected) {
+              setSelectedSquare(null)
+            } else {
+              setSelectedSquare([x,y])
+            }
+          }} />
+        </Box>
       }
       <Typography fontWeight="bold" alignSelf="end"
         sx={{
@@ -97,10 +103,10 @@ function ChessSquare({ x, y, piece, selected }) {
   )
 }
 
-function ChessColumn({ xAxis, pieces, selectedY }) {
+function ChessColumn({ xAxis, pieces, selectedY, setSelectedSquare }) {
   return (
     <Stack direction="column-reverse">
-      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} />)}
+      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} setSelectedSquare={setSelectedSquare} />)}
     </Stack>
   )
 }
@@ -121,7 +127,7 @@ export default function ChessBoard() {
   
   return (
     <Stack direction="row" boxShadow={10}>
-      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} />)}
+      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} setSelectedSquare={setSelectedSquare} />)}
     </Stack>
   )
 }
