@@ -28,9 +28,13 @@ export default function MainContent() {
     endButtonIcon = <RefreshIcon />
   }
   function clickGameButton() {
-    if (mode === 0) setMode(1)
-    else if (mode === 1) setMode(2)
-    else setMode(1)
+    if (mode === 0) {
+      setMode(1)
+    } else if (mode === 1) {
+      setMode(2)
+    } else {
+      setMode(1)
+    }
   }
 
   return (

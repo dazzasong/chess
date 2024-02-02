@@ -13,9 +13,10 @@ import whiteKing from "./images/chesspieces/kl.png";
 import blackKing from "./images/chesspieces/kd.png";
 import React from "react";
 
-function ChessSquare({ x, y, piece }) {
+function ChessSquare({ x, y, piece, selected }) {
   const shaded = (x + y) % 2 === 0
   let src
+  let bgcolor
   switch(piece) {
     case "pl":
       src = whitePawn;
@@ -56,12 +57,20 @@ function ChessSquare({ x, y, piece }) {
     default:
       src = null;
   }
+  if (shaded) {
+    bgcolor = "darkgoldenrod"
+  } else {
+    bgcolor = "burlywood"
+  }
+  if (selected) {
+    bgcolor = "yellow"
+  }
 
   return (
     <Stack
       width={64}
       height={64}
-      bgcolor={shaded ? "darkgoldenrod" : "burlywood"}
+      bgcolor={bgcolor}
       justifyContent="space-between"
       padding={0.2}
     >
@@ -88,10 +97,10 @@ function ChessSquare({ x, y, piece }) {
   )
 }
 
-function ChessColumn({ xAxis, pieces }) {
+function ChessColumn({ xAxis, pieces, selectedY }) {
   return (
     <Stack direction="column-reverse">
-      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} />)}
+      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} />)}
     </Stack>
   )
 }
@@ -108,10 +117,11 @@ export default function ChessBoard() {
     ['rl', 'pl', null, null, null, null, 'pd', 'rd']
   ]
   const [board, setBoard] = React.useState(initialBoard)
-
+  const [selectedSquare, setSelectedSquare] = React.useState(null)
+  
   return (
     <Stack direction="row" boxShadow={10}>
-      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} />)}
+      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} />)}
     </Stack>
   )
 }
