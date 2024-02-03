@@ -6,7 +6,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import React from 'react';
 import { green, orange, red } from "@mui/material/colors";
 import ChessBoard from "./ChessBoard";
-import background from "./images/backgrounds/background.jpg";
+import background from "./assets/images/backgrounds/background.jpg";
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame

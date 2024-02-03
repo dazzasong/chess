@@ -1,16 +1,27 @@
 import { Box, Stack, Typography } from "@mui/material";
-import whitePawn from "./images/chesspieces/pl.png";
-import blackPawn from "./images/chesspieces/pd.png";
-import whiteKnight from "./images/chesspieces/nl.png";
-import blackKnight from "./images/chesspieces/nd.png";
-import whiteBishop from "./images/chesspieces/bl.png";
-import blackBishop from "./images/chesspieces/bd.png";
-import whiteRook from "./images/chesspieces/rl.png";
-import blackRook from "./images/chesspieces/rd.png";
-import whiteQueen from "./images/chesspieces/ql.png";
-import blackQueen from "./images/chesspieces/qd.png";
-import whiteKing from "./images/chesspieces/kl.png";
-import blackKing from "./images/chesspieces/kd.png";
+import whitePawn from "./assets/images/chesspieces/pl.png";
+import blackPawn from "./assets/images/chesspieces/pd.png";
+import whiteKnight from "./assets/images/chesspieces/nl.png";
+import blackKnight from "./assets/images/chesspieces/nd.png";
+import whiteBishop from "./assets/images/chesspieces/bl.png";
+import blackBishop from "./assets/images/chesspieces/bd.png";
+import whiteRook from "./assets/images/chesspieces/rl.png";
+import blackRook from "./assets/images/chesspieces/rd.png";
+import whiteQueen from "./assets/images/chesspieces/ql.png";
+import blackQueen from "./assets/images/chesspieces/qd.png";
+import whiteKing from "./assets/images/chesspieces/kl.png";
+import blackKing from "./assets/images/chesspieces/kd.png";
+import moveSound from "./assets/sounds/move.mp3";
+import captureSound from "./assets/sounds/capture.mp3";
+import checkSound from "./assets/sounds/capture.mp3";
+import castleSound from "./assets/sounds/capture.mp3";
+import promoteSound from "./assets/sounds/capture.mp3";
+import illegalSound from "./assets/sounds/capture.mp3";
+import tenSecondsSound from "./assets/sounds/capture.mp3";
+import knightShout from "./assets/sounds/shouts/knight.mp3";
+import bishopShout from "./assets/sounds/shouts/bishop.mp3";
+import rookShout from "./assets/sounds/shouts/rook.mp3";
+import queenShout from "./assets/sounds/shouts/queen.mp3";
 import React from "react";
 
 function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
@@ -88,6 +99,7 @@ function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
               setSelectedSquare(null)
             } else {
               setSelectedSquare([x,y])
+              console.log(`Selected square coordinates: ${x} ${y}`)
             }
           }} />
         </Box>

@@ -1,5 +1,5 @@
 import { Card, CardContent, Stack, Typography } from "@mui/material"
-import background from "./images/backgrounds/tutorialpage_background.jpg"
+import background from "./assets/images/backgrounds/tutorialpage_background.jpg"
 
 function TutorialCard({ title, text1, text2, text3 }) {
   return (
