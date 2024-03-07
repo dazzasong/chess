@@ -1,15 +1,16 @@
 import { Box, Stack, Typography } from "@mui/material";
+import CircleIcon from '@mui/icons-material/Circle';
 import whitePawn from "./assets/images/chesspieces/pl.png";
-import blackPawn from "./assets/images/chesspieces/pd.png";
-import whiteKnight from "./assets/images/chesspieces/nl.png";
-import blackKnight from "./assets/images/chesspieces/nd.png";
+import whiteKnight from "./assets/images/chesspieces/nl.png"
 import whiteBishop from "./assets/images/chesspieces/bl.png";
-import blackBishop from "./assets/images/chesspieces/bd.png";
 import whiteRook from "./assets/images/chesspieces/rl.png";
-import blackRook from "./assets/images/chesspieces/rd.png";
 import whiteQueen from "./assets/images/chesspieces/ql.png";
-import blackQueen from "./assets/images/chesspieces/qd.png";
 import whiteKing from "./assets/images/chesspieces/kl.png";
+import blackPawn from "./assets/images/chesspieces/pd.png";
+import blackKnight from "./assets/images/chesspieces/nd.png";
+import blackBishop from "./assets/images/chesspieces/bd.png";
+import blackRook from "./assets/images/chesspieces/rd.png";
+import blackQueen from "./assets/images/chesspieces/qd.png";
 import blackKing from "./assets/images/chesspieces/kd.png";
 import moveSound from "./assets/sounds/move.mp3";
 import captureSound from "./assets/sounds/capture.mp3";
@@ -24,10 +25,10 @@ import rookShout from "./assets/sounds/shouts/rook.mp3";
 import queenShout from "./assets/sounds/shouts/queen.mp3";
 import React from "react";
 
-function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
-  const shaded = (x + y) % 2 === 0
-  let src
-  let bgcolor
+function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
+  const shaded = (x + y) % 2 === 0;
+  let src;
+  let bgcolor;
   switch(piece) {
     case "pl":
       src = whitePawn;
@@ -69,12 +70,12 @@ function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
       src = null;
   }
   if (shaded) {
-    bgcolor = "darkgoldenrod"
+    bgcolor = "darkgoldenrod";
   } else {
-    bgcolor = "burlywood"
+    bgcolor = "burlywood";
   }
   if (selected) {
-    bgcolor = "#ffff66"
+    bgcolor = "#ffff66";
   }
 
   return (
@@ -93,17 +94,16 @@ function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
         {x === 0 ? y + 1 : null}
       </Typography>
       { src && 
-        <Box sx={{position: "absolute"}}>
-          <img src={src} alt="Chess piece" onClick={() => {
-            if (selected) {
-              setSelectedSquare(null)
-            } else {
-              setSelectedSquare([x,y])
-              console.log(`Selected square coordinates: ${x} ${y}`)
-            }
-          }} />
+        <Box
+          sx={{
+            position: "absolute",
+            userSelect: "none"
+          }}
+        >
+          <img src={src} alt="Chess piece" onClick={() => clickSquare(x, y, selected, destinated)} />
         </Box>
       }
+      {destinated ? <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} /> : null}
       <Typography fontWeight="bold" alignSelf="end"
         sx={{
           userSelect: "none"
@@ -115,10 +115,10 @@ function ChessSquare({ x, y, piece, selected, setSelectedSquare }) {
   )
 }
 
-function ChessColumn({ xAxis, pieces, selectedY, setSelectedSquare }) {
+function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare }) {
   return (
     <Stack direction="column-reverse">
-      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} setSelectedSquare={setSelectedSquare} />)}
+      {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} destinated={destinationY.includes(y)} clickSquare={clickSquare} />)}
     </Stack>
   )
 }
@@ -133,13 +133,41 @@ export default function ChessBoard() {
     ['bl', 'pl', null, null, null, null, 'pd', 'bd'],
     ['nl', 'pl', null, null, null, null, 'pd', 'nd'],
     ['rl', 'pl', null, null, null, null, 'pd', 'rd']
-  ]
-  const [board, setBoard] = React.useState(initialBoard)
-  const [selectedSquare, setSelectedSquare] = React.useState(null)
-  
+  ];
+  const [board, setBoard] = React.useState(initialBoard);
+  const [selectedSquare, setSelectedSquare] = React.useState(null);
+  const [destinationSquares, setDestinationSquares] = React.useState(null);
+  function clickSquare(x, y, selected, destinated) {
+    if (selected) {
+      setSelectedSquare(null)
+      setDestinationSquares(null)
+    } else {
+      setSelectedSquare([x,y])
+      switch(board[x][y]) {
+        case "pl":
+          if (y === 1) {
+            setDestinationSquares([[x,y+1],[x,y+2]])
+          } else {
+            setDestinationSquares([[x,y+1]])
+          }
+          break;
+        default:
+          setDestinationSquares(null);
+      }
+    }
+  }
+  let destinationColumns = [[],[],[],[],[],[],[],[]]
+  for (let x = 0; x < 8; x++) {
+    for (let coordinate in destinationSquares) {
+      if (destinationSquares[coordinate][0] === x) {
+        destinationColumns[x].push(destinationSquares[coordinate][1])
+      }
+    }
+  }
+
   return (
     <Stack direction="row" boxShadow={10}>
-      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} setSelectedSquare={setSelectedSquare} />)}
+      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
     </Stack>
   )
 }

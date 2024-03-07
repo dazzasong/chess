@@ -17,7 +17,11 @@ export default function Header() {
       >
         Chess
       </Typography>
-      <Link href="#" underline="none" color="inherit" mr={2}>
+      <Link href="#" underline="none" color="inherit" mr={2}
+        sx={{
+          userSelect: "none"
+        }}
+      >
         How to play
       </Link>
     </Stack>

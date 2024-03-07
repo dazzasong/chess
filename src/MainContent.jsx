@@ -10,30 +10,30 @@ import background from "./assets/images/backgrounds/background.jpg";
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame
-  let buttonText
-  let buttonColor
-  let startButtonIcon
-  let endButtonIcon
+  let buttonText;
+  let buttonColor;
+  let startButtonIcon;
+  let endButtonIcon;
   if (mode === 0) {
-    buttonText = "Start new game"
-    buttonColor = green[600]
-    startButtonIcon = <LocalFireDepartmentIcon />
+    buttonText = "Start new game";
+    buttonColor = green[600];
+    startButtonIcon = <LocalFireDepartmentIcon />;
   } else if (mode === 1) {
-    buttonText = "End game"
-    buttonColor = red[600]
-    endButtonIcon = <CancelIcon />
+    buttonText = "End game";
+    buttonColor = red[600];
+    endButtonIcon = <CancelIcon />;
   } else {
-    buttonText = "Rematch"
-    buttonColor = orange[600]
-    endButtonIcon = <RefreshIcon />
+    buttonText = "Rematch";
+    buttonColor = orange[600];
+    endButtonIcon = <RefreshIcon />;
   }
   function clickGameButton() {
     if (mode === 0) {
-      setMode(1)
+      setMode(1);
     } else if (mode === 1) {
-      setMode(2)
+      setMode(2);
     } else {
-      setMode(1)
+      setMode(1);
     }
   }
 
