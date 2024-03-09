@@ -189,7 +189,7 @@ export default function ChessBoard() {
           setDestinationSquares(null);
       }
     } else if (destinated) {
-      const updatedBoard = [board];
+      const updatedBoard = [...board];
       updatedBoard[x][y] = board[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
       setBoard(updatedBoard);
