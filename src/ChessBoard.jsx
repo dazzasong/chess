@@ -12,18 +12,17 @@ import blackBishop from "./assets/images/chesspieces/bb.png";
 import blackRook from "./assets/images/chesspieces/rb.png";
 import blackQueen from "./assets/images/chesspieces/qb.png";
 import blackKing from "./assets/images/chesspieces/kb.png";
-import moveSound from "./assets/sounds/move.mp3";
-import captureSound from "./assets/sounds/capture.mp3";
-import checkSound from "./assets/sounds/capture.mp3";
-import castleSound from "./assets/sounds/capture.mp3";
-import promoteSound from "./assets/sounds/capture.mp3";
-import illegalSound from "./assets/sounds/capture.mp3";
-import tenSecondsSound from "./assets/sounds/capture.mp3";
-import knightShout from "./assets/sounds/shouts/knight.mp3";
-import bishopShout from "./assets/sounds/shouts/bishop.mp3";
-import rookShout from "./assets/sounds/shouts/rook.mp3";
-import queenShout from "./assets/sounds/shouts/queen.mp3";
+import moveAudio from "./assets/sounds/move.mp3";
+import captureAudio from "./assets/sounds/capture.mp3";
+import checkAudio from "./assets/sounds/capture.mp3";
+import castleAudio from "./assets/sounds/capture.mp3";
+import promoteAudio from "./assets/sounds/capture.mp3";
+import illegalAudio from "./assets/sounds/capture.mp3";
+import tenSecondsAudio from "./assets/sounds/capture.mp3";
 import React from "react";
+
+const moveSoundEffect = new Audio(moveAudio);
+const captureSoundEffect = new Audio(captureAudio);
 
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
@@ -171,6 +170,9 @@ export default function ChessBoard() {
           break;
         case 'bw':
         case 'bb':
+          for (let i = 1; i <= spacesUpLeft; i++) {
+            
+          }
           setDestinationSquares([[x-1,y+1],[x-2,y+2],[x-3,y+3],[x-4,y+4],[x-5,y+5],[x-6,y+6],[x-7,y+7],[x+1,y+1],[x+2,y+2],[x+3,y+3],[x+4,y+4],[x+5,y+5],[x+6,y+6],[x+7,y+7],[x-1,y-1],[x-2,y-2],[x-3,y-3],[x-4,y-4],[x-5,y-5],[x-6,y-6],[x-7,y-7],[x+1,y-1],[x+2,y-2],[x+3,y-3],[x+4,y-4],[x+5,y-5],[x+6,y-6],[x+7,y-7]]);
           break;
         case 'rw':
@@ -189,6 +191,11 @@ export default function ChessBoard() {
           setDestinationSquares(null);
       }
     } else if (destinated) {
+      if (board[x][y]) {
+        captureSoundEffect.play();
+      } else {
+        moveSoundEffect.play();
+      }
       const updatedBoard = [...board];
       updatedBoard[x][y] = board[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
