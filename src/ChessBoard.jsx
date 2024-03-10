@@ -151,19 +151,43 @@ export default function ChessBoard() {
       let spacesDownLeft = Math.min(spacesDown, spacesLeft);
       let spacesDownRight = Math.min(spacesDown, spacesRight);
       switch(board[x][y]) {
-        case 'pw': // Enpassant and promotion to be added!
-          if (y === 1) {
-            setDestinationSquares([[x,y+1],[x,y+2]]);
-          } else {
-            setDestinationSquares([[x,y+1]]);
+        case 'pw':
+          if (!board[x][y+1]) {
+            lst.push([x,y+1]);
+            if (y === 1 && !board[x][y+2]) {
+              lst.push([x,y+2]);
+            }
           }
+          if (x > 0) {
+            if (board[x-1][y+1] && board[x-1][y+1][1] === 'b') {
+              lst.push([x-1,y+1]);
+            }
+          }
+          if (x < 7) {
+            if (board[x+1][y+1] && board[x+1][y+1][1] === 'b') {
+              lst.push([x+1,y+1]);
+            }
+          }
+          setDestinationSquares(lst);
           break;
         case 'pb':
-          if (y === 6) {
-            setDestinationSquares([[x,y-1],[x,y-2]]);
-          } else {
-            setDestinationSquares([[x,y-1]]);
+          if (!board[x][y-1]) {
+            lst.push([x,y-1]);
+            if (y === 6 && !board[x][y-2]) {
+              lst.push([x,y-2]);
+            }
           }
+          if (x > 0) {
+            if (board[x-1][y-1] && board[x-1][y-1][1] === 'w') {
+              lst.push([x-1,y-1]);
+            }
+          }
+          if (x < 7) {
+            if (board[x+1][y-1] && board[x+1][y-1][1] === 'w') {
+              lst.push([x+1,y-1]);
+            }
+          }
+          setDestinationSquares(lst);
           break;
         case 'nw':
         case 'nb':
