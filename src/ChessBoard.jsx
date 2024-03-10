@@ -196,16 +196,40 @@ export default function ChessBoard() {
         case 'bw':
         case 'bb':
           for (let i = 1; i <= spacesUpLeft; i++) {
-            lst.push([x-i,y+i]);
+            lst.push([x-i,y+i])
+            if (board[x-i][y+i]) {
+              if (board[x-i][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesUpRight; i++) {
             lst.push([x+i,y+i]);
+            if (board[x+i][y+i]) {
+              if (board[x+i][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDownLeft; i++) {
             lst.push([x-i,y-i]);
+            if (board[x-i][y-i]) {
+              if (board[x-i][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDownRight; i++) {
             lst.push([x+i,y-i]);
+            if (board[x+i][y-i]) {
+              if (board[x+i][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           setDestinationSquares(lst);
           break;
@@ -213,15 +237,39 @@ export default function ChessBoard() {
         case 'rb':
           for (let i = 1; i <= spacesUp; i++) {
             lst.push([x,y+i]);
+            if (board[x][y+i]) {
+              if (board[x][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDown; i++) {
             lst.push([x,y-i]);
+            if (board[x][y-i]) {
+              if (board[x][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesLeft; i++) {
             lst.push([x-i,y]);
+            if (board[x-i][y]) {
+              if (board[x-i][y][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesRight; i++) {
             lst.push([x+i,y]);
+            if (board[x+i][y]) {
+              if (board[x+i][y][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           setDestinationSquares(lst);
           break;
@@ -229,27 +277,75 @@ export default function ChessBoard() {
         case 'qb':
           for (let i = 1; i <= spacesUp; i++) {
             lst.push([x,y+i]);
+            if (board[x][y+i]) {
+              if (board[x][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDown; i++) {
             lst.push([x,y-i]);
+            if (board[x][y-i]) {
+              if (board[x][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesLeft; i++) {
             lst.push([x-i,y]);
+            if (board[x-i][y]) {
+              if (board[x-i][y][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesRight; i++) {
             lst.push([x+i,y]);
+            if (board[x+i][y]) {
+              if (board[x+i][y][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesUpLeft; i++) {
-            lst.push([x-i,y+i]);
+            lst.push([x-i,y+i])
+            if (board[x-i][y+i]) {
+              if (board[x-i][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesUpRight; i++) {
             lst.push([x+i,y+i]);
+            if (board[x+i][y+i]) {
+              if (board[x+i][y+i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDownLeft; i++) {
             lst.push([x-i,y-i]);
+            if (board[x-i][y-i]) {
+              if (board[x-i][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           for (let i = 1; i <= spacesDownRight; i++) {
             lst.push([x+i,y-i]);
+            if (board[x+i][y-i]) {
+              if (board[x+i][y-i][1] === board[x][y][1]) {
+                lst.pop();
+              }
+              break;
+            }
           }
           setDestinationSquares(lst);
           break;
