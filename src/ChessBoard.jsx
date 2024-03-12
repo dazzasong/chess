@@ -191,7 +191,55 @@ export default function ChessBoard() {
           break;
         case 'nw':
         case 'nb':
-          setDestinationSquares([[x-1,y+2],[x+1,y+2],[x-2,y+1],[x+2,y+1],[x-2,y-1],[x+2,y-1],[x-1,y-2],[x+1,y-2]]);
+          if (x > 0) {
+            lst.push([x-1,y+2]);
+            if (board[x-1][y+2] && board[x-1][y+2][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x < 7) {
+            lst.push([x+1,y+2]);
+            if (board[x+1][y+2] && board[x+1][y+2][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x > 1) {
+            lst.push([x-2,y+1]);
+            if (board[x-2][y+1] && board[x-2][y+1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x < 6) {
+            lst.push([x+2,y+1]);
+            if (board[x+2][y+1] && board[x+2][y+1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x > 1) {
+            lst.push([x-2,y-1]);
+            if (board[x-2][y-1] && board[x-2][y-1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x < 6) {
+            lst.push([x+2,y-1]);
+            if (board[x+2][y-1] && board[x+2][y-1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x > 0) {
+            lst.push([x-1,y-2]);
+            if (board[x-1][y-2] && board[x-1][y-2][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          if (x < 7) {
+            lst.push([x+1,y-2]);
+            if (board[x+1][y-2] && board[x+1][y-2][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          setDestinationSquares(lst)
           break;
         case 'bw':
         case 'bb':
@@ -351,7 +399,55 @@ export default function ChessBoard() {
           break;
         case 'kw':
         case 'kb':
-          setDestinationSquares([[x,y+1],[x,y-1],[x-1,y],[x+1,y],[x-1,y+1],[x+1,y+1],[x-1,y-1],[x+1,y-1]]);
+          lst.push([x,y+1]);
+          if (board[x][y+1]) {
+            if (board[x][y+1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x,y-1]);
+          if (board[x][y-1]) {
+            if (board[x][y-1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y]);
+          if (board[x-1][y]) {
+            if (board[x-1][y][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y]);
+          if (board[x+1][y]) {
+            if (board[x+1][y][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y+1]);
+          if (board[x-1][y+1]) {
+            if (board[x-1][y+1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y+1]);
+          if (board[x+1][y+1]) {
+            if (board[x+1][y+1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y-1]);
+          if (board[x-1][y-1]) {
+            if (board[x-1][y-1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y-1]);
+          if (board[x+1][y-1]) {
+            if (board[x+1][y-1][1] === board[x][y][1]) {
+              lst.pop();
+            }
+          }
+          setDestinationSquares(lst)
           break;
         default:
           setDestinationSquares(null);
