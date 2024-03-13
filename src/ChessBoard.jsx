@@ -140,8 +140,12 @@ export default function ChessBoard() {
   const [board, setBoard] = React.useState(initialBoard);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
-  const [rookKingWhiteMoved, setRookKingWhiteMoved] = React.useState(false);
-  const [rookKingBlackMoved, setRookKingBlackMoved] = React.useState(false);
+  const [leftWhiteRookValid, setLeftWhiteRookValidity] = React.useState(true);
+  const [rightWhiteRookValid, setRightWhiteRookValidity] = React.useState(true);
+  const [leftBlackRookValid, setLeftBlackRookValidity] = React.useState(true);
+  const [rightBlackRookValid, setRightBlackRookValidity] = React.useState(true);
+  const [whiteKingValid, setWhiteKingValidity] = React.useState(true);
+  const [blackKingValid, setBlackKingValidity] = React.useState(true);
   function clickSquare(x, y, selected, destinated) {
     if (board[x][y] != null && !selected && !destinated) {
       setSelectedSquare([x,y]);
@@ -450,9 +454,10 @@ export default function ChessBoard() {
               lst.pop();
             }
           }
-          if (x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && rookKingWhiteMoved === false) {
+          if (x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && leftWhiteRookValid && whiteKingValid) {
             lst.push([x-2,y]);
-          } else if (x === 4 && y === 0 && !board[5][0] && !board[6][0] && rookKingWhiteMoved === false) {
+          }
+          if (x === 4 && y === 0 && !board[5][0] && !board[6][0] && rightWhiteRookValid && whiteKingValid) {
             lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
@@ -506,9 +511,10 @@ export default function ChessBoard() {
               lst.pop();
             }
           }
-          if (x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && rookKingBlackMoved === false) {
+          if (x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && leftBlackRookValid && blackKingValid) {
             lst.push([x-2,y]);
-          } else if (x === 4 && y === 7 && !board[4][7] && !board[5][7] && !board[6][7] && rookKingBlackMoved === false) {
+          }
+          if (x === 4 && y === 7 && !board[5][7] && !board[6][7] && rightBlackRookValid && blackKingValid) {
             lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
@@ -522,17 +528,25 @@ export default function ChessBoard() {
       } else {
         moveSoundEffect.play();
       }
+      if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
+        setLeftWhiteRookValidity(false);
+      } else if (selectedSquare[0] === 7 && selectedSquare[1] === 0) {
+        setRightWhiteRookValidity(false);
+      } else if (selectedSquare[0] === 1 && selectedSquare[1] === 7) {
+        setLeftBlackRookValidity(false);
+      } else if (selectedSquare[0] === 7 && selectedSquare[1] === 7) {
+        setRightBlackRookValidity(false);
+      } else if (board[selectedSquare[0]][selectedSquare[1]] === 'kw') {
+        setWhiteKingValidity(false);
+      } else if (board[selectedSquare[0]][selectedSquare[1]] === 'kb') {
+        setBlackKingValidity(false);
+      }
       const updatedBoard = [...board];
-      updatedBoard[x][y] = board[selectedSquare[0]][selectedSquare[1]];
+      updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
       setBoard(updatedBoard);
       setSelectedSquare(null);
       setDestinationSquares(null);
-      if (board[x][y] === 'rw' || board[x][y] === 'kw') {
-        setRookKingWhiteMoved(true);
-      } else if (board[x][y] === 'rb' || board[x][y] === 'kb') {
-        setRookKingBlackMoved(true);
-      }
     } else {
       setSelectedSquare(null);
       setDestinationSquares(null);
