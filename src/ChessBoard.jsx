@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
+import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
 import whiteKnight from "./assets/images/chesspieces/nw.png"
 import whiteBishop from "./assets/images/chesspieces/bw.png";
@@ -29,40 +30,40 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   let src;
   let bgcolor;
   switch(piece) {
-    case "pw":
+    case 'pw':
       src = whitePawn;
       break;
-    case "nw":
+    case 'nw':
       src = whiteKnight;
       break;
-    case "bw":
+    case 'bw':
       src = whiteBishop;
       break;
-    case "rw":
+    case 'rw':
       src = whiteRook;
       break;
-    case "qw":
+    case 'qw':
       src = whiteQueen;
       break;
-    case "kw":
+    case 'kw':
       src = whiteKing;
       break;
-    case "pb":
+    case 'pb':
       src = blackPawn;
       break;
-    case "nb":
+    case 'nb':
       src = blackKnight;
       break;
-    case "bb":
+    case 'bb':
       src = blackBishop;
       break;
-    case "rb":
+    case 'rb':
       src = blackRook;
       break;
-    case "qb":
+    case 'qb':
       src = blackQueen;
       break;
-    case "kb":
+    case 'kb':
       src = blackKing;
       break;
     default:
@@ -103,7 +104,8 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
             <img src={src} alt="Chess piece" />
           </Box>
         }
-        {destinated ? <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} /> : null}
+        {destinated && piece === null ? <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} /> : null}
+        {destinated && piece ? <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center"}} /> : null}
         <Typography fontWeight="bold" alignSelf="end"
           sx={{
             userSelect: "none"
@@ -138,6 +140,8 @@ export default function ChessBoard() {
   const [board, setBoard] = React.useState(initialBoard);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
+  const [rookKingWhiteMoved, setRookKingWhiteMoved] = React.useState(false);
+  const [rookKingBlackMoved, setRookKingBlackMoved] = React.useState(false);
   function clickSquare(x, y, selected, destinated) {
     if (board[x][y] != null && !selected && !destinated) {
       setSelectedSquare([x,y]);
@@ -398,59 +402,119 @@ export default function ChessBoard() {
           setDestinationSquares(lst);
           break;
         case 'kw':
-        case 'kb':
           lst.push([x,y+1]);
           if (board[x][y+1]) {
-            if (board[x][y+1][1] === board[x][y][1]) {
+            if (board[x][y+1][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x,y-1]);
           if (board[x][y-1]) {
-            if (board[x][y-1][1] === board[x][y][1]) {
+            if (board[x][y-1][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x-1,y]);
           if (board[x-1][y]) {
-            if (board[x-1][y][1] === board[x][y][1]) {
+            if (board[x-1][y][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x+1,y]);
           if (board[x+1][y]) {
-            if (board[x+1][y][1] === board[x][y][1]) {
+            if (board[x+1][y][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x-1,y+1]);
           if (board[x-1][y+1]) {
-            if (board[x-1][y+1][1] === board[x][y][1]) {
+            if (board[x-1][y+1][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x+1,y+1]);
           if (board[x+1][y+1]) {
-            if (board[x+1][y+1][1] === board[x][y][1]) {
+            if (board[x+1][y+1][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x-1,y-1]);
           if (board[x-1][y-1]) {
-            if (board[x-1][y-1][1] === board[x][y][1]) {
+            if (board[x-1][y-1][1] === 'w') {
               lst.pop();
             }
           }
           lst.push([x+1,y-1]);
           if (board[x+1][y-1]) {
-            if (board[x+1][y-1][1] === board[x][y][1]) {
+            if (board[x+1][y-1][1] === 'w') {
               lst.pop();
             }
           }
-          setDestinationSquares(lst)
+          if (x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && rookKingWhiteMoved === false) {
+            lst.push([x-2,y]);
+          } else if (x === 4 && y === 0 && !board[5][0] && !board[6][0] && rookKingWhiteMoved === false) {
+            lst.push([x+2,y]);
+          }
+          setDestinationSquares(lst);
+          break;
+        case 'kb':
+          lst.push([x,y+1]);
+          if (board[x][y+1]) {
+            if (board[x][y+1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x,y-1]);
+          if (board[x][y-1]) {
+            if (board[x][y-1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y]);
+          if (board[x-1][y]) {
+            if (board[x-1][y][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y]);
+          if (board[x+1][y]) {
+            if (board[x+1][y][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y+1]);
+          if (board[x-1][y+1]) {
+            if (board[x-1][y+1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y+1]);
+          if (board[x+1][y+1]) {
+            if (board[x+1][y+1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x-1,y-1]);
+          if (board[x-1][y-1]) {
+            if (board[x-1][y-1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          lst.push([x+1,y-1]);
+          if (board[x+1][y-1]) {
+            if (board[x+1][y-1][1] === 'b') {
+              lst.pop();
+            }
+          }
+          if (x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && rookKingBlackMoved === false) {
+            lst.push([x-2,y]);
+          } else if (x === 4 && y === 7 && !board[4][7] && !board[5][7] && !board[6][7] && rookKingBlackMoved === false) {
+            lst.push([x+2,y]);
+          }
+          setDestinationSquares(lst);
           break;
         default:
-          setDestinationSquares(null);
+          throw new Error("Invalid piece!");
       }
     } else if (destinated) {
       if (board[x][y]) {
@@ -464,6 +528,11 @@ export default function ChessBoard() {
       setBoard(updatedBoard);
       setSelectedSquare(null);
       setDestinationSquares(null);
+      if (board[x][y] === 'rw' || board[x][y] === 'kw') {
+        setRookKingWhiteMoved(true);
+      } else if (board[x][y] === 'rb' || board[x][y] === 'kb') {
+        setRookKingBlackMoved(true);
+      }
     } else {
       setSelectedSquare(null);
       setDestinationSquares(null);
@@ -473,7 +542,7 @@ export default function ChessBoard() {
   for (let x = 0; x < 8; x++) {
     for (let coordinate in destinationSquares) {
       if (destinationSquares[coordinate][0] === x) {
-        destinationColumns[x].push(destinationSquares[coordinate][1])
+        destinationColumns[x].push(destinationSquares[coordinate][1]);
       }
     }
   }
