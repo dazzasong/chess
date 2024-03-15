@@ -15,15 +15,16 @@ import blackQueen from "./assets/images/chesspieces/qb.png";
 import blackKing from "./assets/images/chesspieces/kb.png";
 import moveAudio from "./assets/sounds/move.mp3";
 import captureAudio from "./assets/sounds/capture.mp3";
-import checkAudio from "./assets/sounds/capture.mp3";
-import castleAudio from "./assets/sounds/capture.mp3";
-import promoteAudio from "./assets/sounds/capture.mp3";
-import illegalAudio from "./assets/sounds/capture.mp3";
-import tenSecondsAudio from "./assets/sounds/capture.mp3";
+import checkAudio from "./assets/sounds/check.mp3";
+import castleAudio from "./assets/sounds/castle.mp3";
+import promoteAudio from "./assets/sounds/promote.mp3";
+import illegalAudio from "./assets/sounds/illegal.mp3";
+import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
 import React from "react";
 
 const moveSoundEffect = new Audio(moveAudio); // make sounds overlap...
 const captureSoundEffect = new Audio(captureAudio);
+const castleSoundEffect = new Audio(castleAudio);
 
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
@@ -431,11 +432,6 @@ export default function ChessBoard() {
           throw new Error("Invalid piece!");
       }
     } else if (destinated) {
-      if (board[x][y]) {
-        captureSoundEffect.play();
-      } else {
-        moveSoundEffect.play();
-      }
       if (board[selectedSquare[0]][selectedSquare[1]][1] === 'w') { // ask if this is more efficient!
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
@@ -479,9 +475,15 @@ export default function ChessBoard() {
       if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] - 2) {
         updatedBoard[x+1][y] = updatedBoard[0][y];
         updatedBoard[0][y] = null;
+        castleSoundEffect.play();
       } else if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] + 2) {
         updatedBoard[x-1][y] = updatedBoard[0][y];
         updatedBoard[7][y] = null;
+        castleSoundEffect.play();
+      } else if (board[x][y]) {
+        captureSoundEffect.play();
+      } else {
+        moveSoundEffect.play();
       }
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
