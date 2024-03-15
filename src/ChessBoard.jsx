@@ -77,7 +77,6 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   if (selected) {
     bgcolor = "#ffff66";
   }
-
   return (
     <div onClick={() => clickSquare(x, y, selected, destinated)}>
       <Stack
@@ -477,6 +476,13 @@ export default function ChessBoard() {
         }
       }
       const updatedBoard = [...board];
+      if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] - 2) {
+        updatedBoard[x+1][y] = updatedBoard[0][y];
+        updatedBoard[0][y] = null;
+      } else if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] + 2) {
+        updatedBoard[x-1][y] = updatedBoard[0][y];
+        updatedBoard[7][y] = null;
+      }
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
       setBoard(updatedBoard);
@@ -495,7 +501,6 @@ export default function ChessBoard() {
       }
     }
   }
-
   return (
     <Stack direction="row" boxShadow={10}>
       {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
