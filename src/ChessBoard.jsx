@@ -140,8 +140,8 @@ export default function ChessBoard() {
   const [board, setBoard] = React.useState(initialBoard);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
-  const [canCastleWhite, setCanCastleWhite] = React.useState(0);
-  const [canCastleBlack, setCanCastleBlack] = React.useState(0);
+  const [castleStateWhite, setCastleStateWhite] = React.useState(0);
+  const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   function canMove(x, y, toX, toY) {
     if (toX < 0 || toX > 7 || toY < 0 || toY > 7) {
       return false;
@@ -152,7 +152,7 @@ export default function ChessBoard() {
     }
   }
   function clickSquare(x, y, selected, destinated) {
-    if (board[x][y] != null && !selected && !destinated) {
+    if (board[x][y] !== null && !selected && !destinated) {
       setSelectedSquare([x, y]);
       let lst = [];
       let spacesUp = 7 - y;
@@ -387,10 +387,10 @@ export default function ChessBoard() {
           if (canMove(x, y, x+1, y-1)) {
             lst.push([x+1, y-1]);
           }
-          if (x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0]) { // add conditions for castling
+          if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') {
             lst.push([x-2,y]);
           }
-          if (x === 4 && y === 0 && !board[5][0] && !board[6][0]) { // add conditions for castling
+          if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !board[5][0] && !board[6][0] && board[7][0] === 'rw') {
             lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
@@ -420,10 +420,10 @@ export default function ChessBoard() {
           if (canMove(x, y, x+1, y-1)) {
             lst.push([x+1, y-1]);
           }
-          if (x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7]) {
+          if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') {
             lst.push([x-2, y]);
           }
-          if (x === 4 && y === 7 && !board[5][7] && !board[6][7]) {
+          if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7] === 'rb') {
             lst.push([x+2, y]);
           }
           setDestinationSquares(lst);
@@ -437,18 +437,44 @@ export default function ChessBoard() {
       } else {
         moveSoundEffect.play();
       }
-      if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
-        setCanCastleWhite(1);
-      } else if (selectedSquare[0] === 7 && selectedSquare[1] === 0) {
-        setCanCastleWhite(-1);
-      } else if (board[selectedSquare[0]][selectedSquare[1]] === 'kw') {
-        setCanCastleWhite(2);
-      } else if (selectedSquare[0] === 1 && selectedSquare[1] === 7) {
-        setCanCastleBlack(1);
-      } else if (selectedSquare[0] === 7 && selectedSquare[1] === 7) {
-        setCanCastleBlack(-1);
-      } else if (board[selectedSquare[0]][selectedSquare[1]] === 'kb') {
-        setCanCastleBlack(2);
+      if (board[selectedSquare[0]][selectedSquare[1]][1] === 'w') { // ask if this is more efficient!
+        if (castleStateWhite === 0) {
+          if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
+            setCastleStateWhite(1);
+          } else if (selectedSquare[0] === 7 && selectedSquare[1] === 0) {
+            setCastleStateWhite(-1);
+          }
+        } else if (castleStateWhite === -1) {
+          if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
+            setCastleStateWhite(2);
+          }
+        } else if (castleStateWhite === 1) {
+          if (selectedSquare[0] === 7 && selectedSquare[1] === 0) {
+            setCastleStateWhite(2);
+          }
+        }
+        if (selectedSquare[0] === 4 && selectedSquare[1] === 0) {
+          setCastleStateWhite(2);
+        }
+      } else if (board[selectedSquare[0]][selectedSquare[1]][1] === 'b') {
+        if (castleStateBlack === 0) {
+          if (selectedSquare[0] === 0 && selectedSquare[1] === 7) {
+            setCastleStateBlack(1);
+          } else if (selectedSquare[0] === 7 && selectedSquare[1] === 7) {
+            setCastleStateBlack(-1);
+          }
+        } else if (castleStateBlack === -1) {
+          if (selectedSquare[0] === 0 && selectedSquare[1] === 7) {
+            setCastleStateBlack(2);
+          }
+        } else if (castleStateBlack === 1) {
+          if (selectedSquare[0] === 7 && selectedSquare[1] === 7) {
+            setCastleStateBlack(2);
+          }
+        }
+        if (selectedSquare[0] === 4 && selectedSquare[1] === 7) {
+          setCastleStateBlack(2);
+        }
       }
       const updatedBoard = [...board];
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
