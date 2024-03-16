@@ -160,6 +160,7 @@ export default function ChessBoard() {
     ['rw', 'pw', null, null, null, null, 'pb', 'rb']
   ];
   const [board, setBoard] = React.useState(initialBoard);
+  const [turn, setTurn] = React.useState('w');
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
@@ -174,7 +175,7 @@ export default function ChessBoard() {
     }
   }
   function clickSquare(x, y, selected, destinated) {
-    if (board[x][y] !== null && !selected && !destinated) {
+    if (board[x][y] !== null && board[x][y][1] === turn && !selected && !destinated) {
       setSelectedSquare([x, y]);
       let lst = [];
       let spacesUp = 7 - y;
@@ -454,7 +455,7 @@ export default function ChessBoard() {
           throw new Error("Invalid piece!");
       }
     } else if (destinated) {
-      if (board[selectedSquare[0]][selectedSquare[1]][1] === 'w') { // ask if this is more efficient!
+      if (turn === 'w') { // ask if this is more efficient!
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
             setCastleStateWhite(1);
@@ -473,7 +474,7 @@ export default function ChessBoard() {
         if (selectedSquare[0] === 4 && selectedSquare[1] === 0) {
           setCastleStateWhite(2);
         }
-      } else if (board[selectedSquare[0]][selectedSquare[1]][1] === 'b') {
+      } else if (turn === 'b') {
         if (castleStateBlack === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 7) {
             setCastleStateBlack(1);
@@ -502,7 +503,7 @@ export default function ChessBoard() {
         updatedBoard[x-1][y] = updatedBoard[0][y];
         updatedBoard[7][y] = null;
         castleSoundEffect.play();
-      } else {
+      } else { // ask if this is efficient too!
         if (board[x][y]) {
           captureSoundEffect.play();
         } else {
@@ -514,6 +515,11 @@ export default function ChessBoard() {
       setBoard(updatedBoard);
       setSelectedSquare(null);
       setDestinationSquares(null);
+      if (turn === 'w') {
+        setTurn('b');
+      } else {
+        setTurn('w')
+      }
     } else {
       setSelectedSquare(null);
       setDestinationSquares(null);
