@@ -480,10 +480,12 @@ export default function ChessBoard() {
         updatedBoard[x-1][y] = updatedBoard[0][y];
         updatedBoard[7][y] = null;
         castleSoundEffect.play();
-      } else if (board[x][y]) {
-        captureSoundEffect.play();
       } else {
-        moveSoundEffect.play();
+        if (board[x][y]) {
+          captureSoundEffect.play();
+        } else {
+          moveSoundEffect.play();
+        }
       }
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
