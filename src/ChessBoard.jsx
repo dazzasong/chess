@@ -1,15 +1,15 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
-import whiteKnight from "./assets/images/chesspieces/nw.png"
 import whiteBishop from "./assets/images/chesspieces/bw.png";
+import whiteKnight from "./assets/images/chesspieces/nw.png"
 import whiteRook from "./assets/images/chesspieces/rw.png";
 import whiteQueen from "./assets/images/chesspieces/qw.png";
 import whiteKing from "./assets/images/chesspieces/kw.png";
 import blackPawn from "./assets/images/chesspieces/pb.png";
-import blackKnight from "./assets/images/chesspieces/nb.png";
 import blackBishop from "./assets/images/chesspieces/bb.png";
+import blackKnight from "./assets/images/chesspieces/nb.png";
 import blackRook from "./assets/images/chesspieces/rb.png";
 import blackQueen from "./assets/images/chesspieces/qb.png";
 import blackKing from "./assets/images/chesspieces/kb.png";
@@ -26,6 +26,28 @@ const moveSoundEffect = new Audio(moveAudio); // make sounds overlap...
 const captureSoundEffect = new Audio(captureAudio);
 const castleSoundEffect = new Audio(castleAudio);
 
+function PromotionCard({ color }) {
+  return (
+    <Stack
+      bgcolor={"gray"}
+      border={"solid"}
+    >
+      <IconButton>
+        <img src={color ? blackQueen : whiteQueen} alt={color ? "Black Queen" : "White Queen"} />
+      </IconButton>
+      <IconButton>
+        <img src={color ? blackRook : whiteRook} alt={color ? "Black Rook" : "White Rook"} />
+      </IconButton>
+      <IconButton>
+        <img src={color ? blackKnight : whiteKnight} alt={color ? "Black Knight" : "White Knight"} />
+      </IconButton>
+      <IconButton>
+        <img src={color ? blackBishop : whiteBishop} alt={color ? "Black Bishop" : "White Bishop"} />
+      </IconButton>
+    </Stack>
+  )
+}
+
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
   let src;
@@ -34,11 +56,11 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
     case 'pw':
       src = whitePawn;
       break;
-    case 'nw':
-      src = whiteKnight;
-      break;
     case 'bw':
       src = whiteBishop;
+      break;
+    case 'nw':
+      src = whiteKnight;
       break;
     case 'rw':
       src = whiteRook;
@@ -194,34 +216,6 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
-        case 'nw':
-        case 'nb':
-          if (canMove(x, y, x-1, y+2)) {
-            lst.push([x-1, y+2]);
-          }
-          if (canMove(x, y, x+1, y+2)) {
-            lst.push([x+1, y+2]);
-          }
-          if (canMove(x, y, x-2, y+1)) {
-            lst.push([x-2, y+1]);
-          }
-          if (canMove(x, y, x+2, y+1)) {
-            lst.push([x+2, y+1]);
-          }
-          if (canMove(x, y, x-2, y-1)) {
-            lst.push([x-2, y-1]);
-          }
-          if (canMove(x, y, x+2, y-1)) {
-            lst.push([x+2, y-1]);
-          }
-          if (canMove(x, y, x-1, y-2)) {
-            lst.push([x-1, y-2]);
-          }
-          if (canMove(x, y, x+1,y-2)) {
-            lst.push([x+1, y-2]);
-          }
-          setDestinationSquares(lst)
-          break;
         case 'bw':
         case 'bb':
           for (let i = 1; i <= spacesUpLeft; i++) {
@@ -257,6 +251,34 @@ export default function ChessBoard() {
             }
           }
           setDestinationSquares(lst);
+          break;
+        case 'nw':
+        case 'nb':
+          if (canMove(x, y, x-1, y+2)) {
+            lst.push([x-1, y+2]);
+          }
+          if (canMove(x, y, x+1, y+2)) {
+            lst.push([x+1, y+2]);
+          }
+          if (canMove(x, y, x-2, y+1)) {
+            lst.push([x-2, y+1]);
+          }
+          if (canMove(x, y, x+2, y+1)) {
+            lst.push([x+2, y+1]);
+          }
+          if (canMove(x, y, x-2, y-1)) {
+            lst.push([x-2, y-1]);
+          }
+          if (canMove(x, y, x+2, y-1)) {
+            lst.push([x+2, y-1]);
+          }
+          if (canMove(x, y, x-1, y-2)) {
+            lst.push([x-1, y-2]);
+          }
+          if (canMove(x, y, x+1,y-2)) {
+            lst.push([x+1, y-2]);
+          }
+          setDestinationSquares(lst)
           break;
         case 'rw':
         case 'rb':
