@@ -160,32 +160,18 @@ export default function ChessBoard() {
     ['rw', 'pw', null, null, null, null, 'pb', 'rb']
   ];
   const [board, setBoard] = React.useState(initialBoard);
-  const [turn, setTurn] = React.useState('w');
+  const [turn, setTurn] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
-  function canMove(x, y, toX, toY) {
-    if (toX < 0 || toX > 7 || toY < 0 || toY > 7) {
-      return false;
-    } else if (board[toX][toY] && board[toX][toY][1] === board[x][y][1]) {
-      return false;
-    } else {
-      return true;
-    }
-  }
+  let color = turn ? 'b' : 'w';
   function clickSquare(x, y, selected, destinated) {
-    if (board[x][y] !== null && board[x][y][1] === turn && !selected && !destinated) {
+    if (board[x][y] !== null && board[x][y][1] === color && !selected && !destinated) {
       setSelectedSquare([x, y]);
       let lst = [];
-      let spacesUp = 7 - y;
-      let spacesDown = y;
-      let spacesLeft = x;
-      let spacesRight = 7 - x;
-      let spacesUpLeft = Math.min(spacesUp, spacesLeft);
-      let spacesUpRight = Math.min(spacesUp, spacesRight);
-      let spacesDownLeft = Math.min(spacesDown, spacesLeft);
-      let spacesDownRight = Math.min(spacesDown, spacesRight);
+      let spacesUp = 7 - y, spacesDown = y, spacesLeft = x, spacesRight = 7 - x;
+      let spacesUpLeft = Math.min(spacesUp, spacesLeft), spacesUpRight = Math.min(spacesUp, spacesRight), spacesDownLeft = Math.min(spacesDown, spacesLeft), spacesDownRight = Math.min(spacesDown, spacesRight);
       switch(board[x][y]) {
         case 'pw':
           if (!board[x][y+1]) {
@@ -386,38 +372,6 @@ export default function ChessBoard() {
           setDestinationSquares(lst);
           break;
         case 'kw':
-          if (canMove(x, y, x, y+1)) {
-            lst.push([x, y+1]);
-          }
-          if (canMove(x, y, x, y-1)) {
-            lst.push([x, y-1]);
-          }
-          if (canMove(x, y, x-1, y)) {
-            lst.push([x-1, y]);
-          }
-          if (canMove(x, y, x+1, y)) {
-            lst.push([x+1, y]);
-          }
-          if (canMove(x, y, x-1, y+1)) {
-            lst.push([x-1, y+1]);
-          }
-          if (canMove(x, y, x+1, y+1)) {
-            lst.push([x+1, y+1]);
-          }
-          if (canMove(x, y, x-1, y-1)) {
-            lst.push([x-1, y-1]);
-          }
-          if (canMove(x, y, x+1, y-1)) {
-            lst.push([x+1, y-1]);
-          }
-          if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') {
-            lst.push([x-2,y]);
-          }
-          if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !board[5][0] && !board[6][0] && board[7][0] === 'rw') {
-            lst.push([x+2,y]);
-          }
-          setDestinationSquares(lst);
-          break;
         case 'kb':
           if (canMove(x, y, x, y+1)) {
             lst.push([x, y+1]);
@@ -443,11 +397,20 @@ export default function ChessBoard() {
           if (canMove(x, y, x+1, y-1)) {
             lst.push([x+1, y-1]);
           }
-          if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') {
-            lst.push([x-2, y]);
-          }
-          if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7] === 'rb') {
-            lst.push([x+2, y]);
+          if (turn) {
+            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rw') {
+              lst.push([x-2,y]);
+            }
+            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7] === 'rw') {
+              lst.push([x+2,y]);
+            }
+          } else {
+            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') {
+              lst.push([x-2,y]);
+            }
+            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !board[5][0] && !board[6][0] && board[7][0] === 'rw') {
+              lst.push([x+2,y]);
+            }
           }
           setDestinationSquares(lst);
           break;
@@ -455,7 +418,7 @@ export default function ChessBoard() {
           throw new Error("Invalid piece!");
       }
     } else if (destinated) {
-      if (turn === 'w') { // ask if this is more efficient!
+      if (color === 'w') { // ask if this is more efficient!
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
             setCastleStateWhite(1);
@@ -474,7 +437,7 @@ export default function ChessBoard() {
         if (selectedSquare[0] === 4 && selectedSquare[1] === 0) {
           setCastleStateWhite(2);
         }
-      } else if (turn === 'b') {
+      } else if (color === 'b') {
         if (castleStateBlack === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 7) {
             setCastleStateBlack(1);
@@ -515,14 +478,31 @@ export default function ChessBoard() {
       setBoard(updatedBoard);
       setSelectedSquare(null);
       setDestinationSquares(null);
-      if (turn === 'w') {
-        setTurn('b');
+      if (turn === 0) {
+        setTurn(1);
       } else {
-        setTurn('w')
+        setTurn(0);
       }
     } else {
       setSelectedSquare(null);
       setDestinationSquares(null);
+    }
+  }
+  function canMove(x, y, toX, toY) {
+    if (toX < 0 || toX > 7 || toY < 0 || toY > 7) {
+      return false;
+    } else if (board[toX][toY] && board[toX][toY][1] === board[x][y][1]) {
+      return false;
+    }
+    return true;
+  }
+  function getKingPosition(board) {
+    for (let x = 0; x < 7; x++) {
+      for (let y = 0; y < 7; y++) {
+        if (board[x][y] === `k${color}`) {
+          return [x, y];
+        }
+      }
     }
   }
   let destinationColumns = [[],[],[],[],[],[],[],[]];
