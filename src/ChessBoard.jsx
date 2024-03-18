@@ -398,10 +398,10 @@ export default function ChessBoard() {
             lst.push([x+1, y-1]);
           }
           if (turn) {
-            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rw') {
+            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') {
               lst.push([x-2,y]);
             }
-            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7] === 'rw') {
+            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7] === 'rb') {
               lst.push([x+2,y]);
             }
           } else {
@@ -493,8 +493,9 @@ export default function ChessBoard() {
       return false;
     } else if (board[toX][toY] && board[toX][toY][1] === board[x][y][1]) {
       return false;
+    } else {
+      return true;
     }
-    return true;
   }
   function getKingPosition(board) {
     for (let x = 0; x < 7; x++) {
