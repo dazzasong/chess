@@ -18,7 +18,6 @@ import captureAudio from "./assets/sounds/capture.mp3";
 import checkAudio from "./assets/sounds/check.mp3";
 import castleAudio from "./assets/sounds/castle.mp3";
 import promoteAudio from "./assets/sounds/promote.mp3";
-import illegalAudio from "./assets/sounds/illegal.mp3";
 import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
 import React from "react";
 
