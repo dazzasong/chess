@@ -27,6 +27,9 @@ const castleSoundEffect = new Audio(castleAudio);
 const checkSoundEffect = new Audio(checkAudio);
 
 function PromotionCard({ color }) {
+  function choosePromotionPiece() {
+
+  }
   return (
     <Stack
       bgcolor={"gray"}
@@ -161,12 +164,49 @@ export default function ChessBoard() {
   ];
   const [board, setBoard] = React.useState(initialBoard);
   const [turn, setTurn] = React.useState(0);
+  const [pointsWhite, setPointsWhite] = React.useState(0);
+  const [pointsBlack, setPointsBlack] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const color = turn ? 'b' : 'w';
   const opposingColor = !turn ? 'b' : 'w';
+  function addPoint(pieceTaken) {
+    switch (pieceTaken[0]) {
+      case 'p':
+        if (turn) {
+          setPointsBlack(pointsBlack + 1);
+        } else {
+          setPointsWhite(pointsWhite + 1);
+        }
+        break;
+      case 'b':
+      case 'n':
+        if (turn) {
+          setPointsBlack(pointsBlack + 3);
+        } else {
+          setPointsWhite(pointsWhite + 3);
+        }
+        break;
+      case 'r':
+        if (turn) {
+          setPointsBlack(pointsBlack + 5);
+        } else {
+          setPointsWhite(pointsWhite + 5);
+        }
+        break;
+      case 'q':
+        if (turn) {
+          setPointsBlack(pointsBlack + 9);
+        } else {
+          setPointsWhite(pointsWhite + 9);
+        }
+        break;
+      default:
+        throw new Error("Invalid pieceTaken!");
+    }
+  }
   function spacesLen(x, y, direction) { // 0=up, 1=right, 2=down, 3=left, 4=upleft, 5=upright, 6=downright, 7=downleft
     switch (direction) {
       case 0:
@@ -588,6 +628,7 @@ export default function ChessBoard() {
         castleSoundEffect.play();
       } else if (board[x][y]) {
         captureSoundEffect.play();
+        addPoint(board[x][y]);
       } else {
         moveSoundEffect.play();
       }
@@ -613,8 +654,19 @@ export default function ChessBoard() {
     }
   }
   return (
-    <Stack direction="row" boxShadow={10}>
-      {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
+    <Stack direction="row">
+      <PromotionCard />
+      <Stack direction="row" boxShadow={10}>
+        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
+      </Stack>
+      <Stack spacing={59}>
+        <Typography fontSize={20} fontWeight="bold">
+          {pointsWhite}
+        </Typography>
+        <Typography fontSize={20} fontWeight="bold">
+          {pointsBlack}
+        </Typography>
+      </Stack>
     </Stack>
   )
 }
