@@ -26,25 +26,22 @@ const captureSoundEffect = new Audio(captureAudio);
 const castleSoundEffect = new Audio(castleAudio);
 const checkSoundEffect = new Audio(checkAudio);
 
-function PromotionCard({ color }) {
-  function choosePromotionPiece() {
-
-  }
+function PromotionCard({ color }) { // promotion sends piece, board sends coords
   return (
     <Stack
       bgcolor={"gray"}
       border={"solid"}
     >
-      <IconButton>
+      <IconButton onClick={() => 'q'}>
         <img src={color ? blackQueen : whiteQueen} alt={color ? "Black Queen" : "White Queen"} />
       </IconButton>
-      <IconButton>
+      <IconButton onClick={() => 'r'}>
         <img src={color ? blackRook : whiteRook} alt={color ? "Black Rook" : "White Rook"} />
       </IconButton>
-      <IconButton>
+      <IconButton onClick={() => 'n'}>
         <img src={color ? blackKnight : whiteKnight} alt={color ? "Black Knight" : "White Knight"} />
       </IconButton>
-      <IconButton>
+      <IconButton onClick={() => 'b'}>
         <img src={color ? blackBishop : whiteBishop} alt={color ? "Black Bishop" : "White Bishop"} />
       </IconButton>
     </Stack>
@@ -170,6 +167,7 @@ export default function ChessBoard() {
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
+  const [promotion, setPromotion] = React.useState(0);
   const color = turn ? 'b' : 'w';
   const opposingColor = !turn ? 'b' : 'w';
   function addPoint(pieceTaken) {
@@ -570,7 +568,8 @@ export default function ChessBoard() {
           throw new Error("Invalid piece!");
       }
     } else if (destinated) {
-      let isCastle = false;
+      let castle = false;
+      let promotion = false;
       if (color === 'w') {
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
@@ -616,15 +615,15 @@ export default function ChessBoard() {
       if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] - 2) {
         updatedBoard[x+1][y] = updatedBoard[0][y];
         updatedBoard[0][y] = null;
-        isCastle = true;
+        castle = true;
       } else if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] + 2) {
         updatedBoard[x-1][y] = updatedBoard[0][y];
         updatedBoard[7][y] = null;
-        isCastle = true;
+        castle = true;
       }
       if (isKingInCheck(updatedBoard, true)) {
         checkSoundEffect.play();
-      } else if (isCastle) {
+      } else if (castle) {
         castleSoundEffect.play();
       } else if (board[x][y]) {
         captureSoundEffect.play();
@@ -655,16 +654,16 @@ export default function ChessBoard() {
   }
   return (
     <Stack direction="row">
-      <PromotionCard />
+      {promotion && <PromotionCard />}
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
       <Stack spacing={59}>
         <Typography fontSize={20} fontWeight="bold">
-          {pointsWhite}
+          {pointsBlack}
         </Typography>
         <Typography fontSize={20} fontWeight="bold">
-          {pointsBlack}
+          {pointsWhite}
         </Typography>
       </Stack>
     </Stack>
