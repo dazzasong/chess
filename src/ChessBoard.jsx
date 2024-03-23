@@ -21,9 +21,10 @@ import promoteAudio from "./assets/sounds/promote.mp3";
 import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
 import React from "react";
 
-const moveSoundEffect = new Audio(moveAudio); // make sounds overlap...
+const moveSoundEffect = new Audio(moveAudio); // make sounds overlap when played quickly
 const captureSoundEffect = new Audio(captureAudio);
 const castleSoundEffect = new Audio(castleAudio);
+const checkSoundEffect = new Audio(checkAudio);
 
 function PromotionCard({ color }) {
   return (
@@ -164,8 +165,8 @@ export default function ChessBoard() {
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
-  let color = turn ? 'b' : 'w';
-  let opposingColor = !turn ? 'b' : 'w';
+  const color = turn ? 'b' : 'w';
+  const opposingColor = !turn ? 'b' : 'w';
   function spacesLen(x, y, direction) { // 0=up, 1=right, 2=down, 3=left, 4=upleft, 5=upright, 6=downright, 7=downleft
     switch (direction) {
       case 0:
@@ -188,6 +189,82 @@ export default function ChessBoard() {
         throw new Error("Invalid direction!");
     }
   }
+  function isKingInCheck(board, opposing = false) {
+    let kingX, kingY;
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if (board[i][j] === `k${opposing ? opposingColor : color}`) {
+          kingX = i;
+          kingY = j;
+        }
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 0); i++) {
+      if (board[kingX][kingY+i] === `r${opposing ? color : opposingColor}` || board[kingX][kingY+i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX][kingY+i]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 1); i++) {
+      if (board[kingX+i][kingY] === `r${opposing ? color : opposingColor}` || board[kingX+i][kingY] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX+i][kingY]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 2); i++) {
+      if (board[kingX][kingY-i] === `r${opposing ? color : opposingColor}` || board[kingX][kingY-i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX][kingY-i]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 3); i++) {
+      if (board[kingX-i][kingY] === `r${opposing ? color : opposingColor}` || board[kingX-i][kingY] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX-i][kingY]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
+      if (board[kingX-i][kingY+i] === `b${opposing ? color : opposingColor}` || board[kingX-i][kingY+i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX-i][kingY+i]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 5); i++) {
+      if (board[kingX+i][kingY+i] === `b${opposing ? color : opposingColor}` || board[kingX+i][kingY+i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX+i][kingY+i]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 6); i++) {
+      if (board[kingX+i][kingY-i] === `b${opposing ? color : opposingColor}` || board[kingX+i][kingY-i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX+i][kingY-i]) {
+        break;
+      }
+    }
+    for (let i = 1; i <= spacesLen(kingX, kingY, 7); i++) {
+      if (board[kingX-i][kingY-i] === `b${opposing ? color : opposingColor}` || board[kingX-i][kingY-i] === `q${opposing ? color : opposingColor}`) {
+        return true;
+      }
+      if (board[kingX-i][kingY-i]) {
+        break;
+      }
+    }
+    return false;
+  }
   function clickSquare(x, y, selected, destinated) {
     function canMove(toX, toY) {
       if (toX < 0 || toX > 7 || toY < 0 || toY > 7) {
@@ -195,93 +272,23 @@ export default function ChessBoard() {
       } else if (board[toX][toY] && board[toX][toY][1] === color) {
         return false;
       }
-      // Checks if king will be in check
-      let tempBoard = board.map(innerArray => innerArray.slice());
+      let tempBoard = board.map(row => [...row]);
       tempBoard[toX][toY] = tempBoard[x][y];
       tempBoard[x][y] = null;
-      let kingX, kingY;
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          if (tempBoard[i][j] === `k${color}`) {
-            kingX = i;
-            kingY = j;
-          }
-        }
+      if (isKingInCheck(tempBoard)) {
+        return false;
+      } else {
+        return true;
       }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 0); i++) {
-        if (tempBoard[kingX][kingY+i] === `r${opposingColor}` || tempBoard[kingX][kingY+i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX][kingY+i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 1); i++) {
-        if (tempBoard[kingX+i][kingY] === `r${opposingColor}` || tempBoard[kingX+i][kingY] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX+i][kingY]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 2); i++) {
-        if (tempBoard[kingX][kingY-i] === `r${opposingColor}` || tempBoard[kingX][kingY-i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX][kingY-i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 3); i++) {
-        if (tempBoard[kingX-i][kingY] === `r${opposingColor}` || tempBoard[kingX-i][kingY] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX-i][kingY]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
-        if (tempBoard[kingX-i][kingY+i] === `b${opposingColor}` || tempBoard[kingX-i][kingY+i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX-i][kingY+i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 5); i++) {
-        if (tempBoard[kingX+i][kingY+i] === `b${opposingColor}` || tempBoard[kingX+i][kingY+i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX+i][kingY+i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 6); i++) {
-        if (tempBoard[kingX+i][kingY-i] === `b${opposingColor}` || tempBoard[kingX+i][kingY-i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX+i][kingY-i]) {
-          break;
-        }
-      }
-      for (let i = 1; i <= spacesLen(kingX, kingY, 7); i++) {
-        if (tempBoard[kingX-i][kingY-i] === `b${opposingColor}` || tempBoard[kingX-i][kingY-i] === `q${opposingColor}`) {
-          return false;
-        }
-        if (tempBoard[kingX-i][kingY-i]) {
-          break;
-        }
-      }
-      return true;
     }
     if (board[x][y] !== null && board[x][y][1] === color && !selected && !destinated) {
       setSelectedSquare([x, y]);
       let lst = [];
       switch (board[x][y]) {
         case 'pw':
-          if (!board[x][y+1]) {
+          if (!board[x][y+1] && canMove(x, y+1)) {
             lst.push([x, y+1]);
-            if (y === 1 && !board[x][y+2]) {
+            if (y === 1 && !board[x][y+2] && canMove(x, y+2)) {
               lst.push([x, y+2]);
             }
           }
@@ -294,9 +301,9 @@ export default function ChessBoard() {
           setDestinationSquares(lst);
           break;
         case 'pb':
-          if (!board[x][y-1]) {
+          if (!board[x][y-1] && canMove(x, y-1)) {
             lst.push([x,y-1]);
-            if (y === 6 && !board[x][y-2]) {
+            if (y === 6 && !board[x][y-2] && canMove(x, y-2)) {
               lst.push([x, y-2]);
             }
           }
@@ -523,7 +530,8 @@ export default function ChessBoard() {
           throw new Error("Invalid piece!");
       }
     } else if (destinated) {
-      if (color === 'w') { // ask if this is more efficient!
+      let isCastle = false;
+      if (color === 'w') {
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
             setCastleStateWhite(1);
@@ -562,24 +570,27 @@ export default function ChessBoard() {
           setCastleStateBlack(2);
         }
       }
-      const updatedBoard = [...board];
+      const updatedBoard = board.map(row => [...row]);
+      updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
+      updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
       if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] - 2) {
         updatedBoard[x+1][y] = updatedBoard[0][y];
         updatedBoard[0][y] = null;
-        castleSoundEffect.play();
+        isCastle = true;
       } else if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] + 2) {
         updatedBoard[x-1][y] = updatedBoard[0][y];
         updatedBoard[7][y] = null;
-        castleSoundEffect.play();
-      } else { // ask if this is efficient too!
-        if (board[x][y]) {
-          captureSoundEffect.play();
-        } else {
-          moveSoundEffect.play();
-        }
+        isCastle = true;
       }
-      updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
-      updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
+      if (isKingInCheck(updatedBoard, true)) {
+        checkSoundEffect.play();
+      } else if (isCastle) {
+        castleSoundEffect.play();
+      } else if (board[x][y]) {
+        captureSoundEffect.play();
+      } else {
+        moveSoundEffect.play();
+      }
       setBoard(updatedBoard);
       setSelectedSquare(null);
       setDestinationSquares(null);
