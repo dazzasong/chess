@@ -21,7 +21,7 @@ import promoteAudio from "./assets/sounds/promote.mp3";
 import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
 import React from "react";
 
-const moveSoundEffect = new Audio(moveAudio); // make sounds overlap when played quickly
+const moveSoundEffect = new Audio(moveAudio);
 const captureSoundEffect = new Audio(captureAudio);
 const castleSoundEffect = new Audio(castleAudio);
 const checkSoundEffect = new Audio(checkAudio);
@@ -126,8 +126,8 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
             <img src={src} alt="Chess piece" />
           </Box>
         }
-        {destinated && !piece ? <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} /> : null}
-        {destinated && piece ? <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center"}} /> : null}
+        {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} />}
+        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center"}} />}
         <Typography fontWeight="bold" alignSelf="end"
           sx={{
             userSelect: "none"
@@ -167,7 +167,7 @@ export default function ChessBoard() {
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0);
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
-  const [promotion, setPromotion] = React.useState(0);
+  const [promotion, setPromotion] = React.useState(false);
   const color = turn ? 'b' : 'w';
   const opposingColor = !turn ? 'b' : 'w';
   function addPoint(pieceTaken) {
@@ -205,7 +205,7 @@ export default function ChessBoard() {
         throw new Error("Invalid pieceTaken!");
     }
   }
-  function spacesLen(x, y, direction) { // 0=up, 1=right, 2=down, 3=left, 4=upleft, 5=upright, 6=downright, 7=downleft
+  function spacesLen(x, y, direction) {
     switch (direction) {
       case 0:
         return 7 - y;
@@ -227,13 +227,36 @@ export default function ChessBoard() {
         throw new Error("Invalid direction!");
     }
   }
-  function isKingInCheck(board, opposing = false) {
+  function kingInCheck(board, opposing = false) {
     let kingX, kingY;
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         if (board[i][j] === `k${opposing ? opposingColor : color}`) {
           kingX = i;
           kingY = j;
+        }
+      }
+    }
+    if (turn) {
+      if (kingX > 0 && kingY > 0) {
+        if (board[kingX-1][kingY-1] === `p${opposing ? color : opposingColor}`) {
+          return true;
+        }
+      }
+      if (kingX < 7 && kingY > 0) {
+        if (board[kingX+1][kingY-1] === `p${opposing ? color : opposingColor}`) {
+          return true;
+        }
+      }
+    } else {
+      if (kingX > 0 && kingY < 7) {
+        if (board[kingX-1][kingY+1] === `p${opposing ? color : opposingColor}`) {
+          return true;
+        }
+      }
+      if (kingX < 7 && kingY < 7) {
+        if (board[kingX+1][kingY+1] === `p${opposing ? color : opposingColor}`) {
+          return true;
         }
       }
     }
@@ -313,7 +336,7 @@ export default function ChessBoard() {
       let tempBoard = board.map(row => [...row]);
       tempBoard[toX][toY] = tempBoard[x][y];
       tempBoard[x][y] = null;
-      if (isKingInCheck(tempBoard)) {
+      if (kingInCheck(tempBoard)) {
         return false;
       } else {
         return true;
@@ -323,38 +346,24 @@ export default function ChessBoard() {
       setSelectedSquare([x, y]);
       let lst = [];
       switch (board[x][y]) {
-        case 'pw':
-          if (!board[x][y+1] && canMove(x, y+1)) {
-            lst.push([x, y+1]);
-            if (y === 1 && !board[x][y+2] && canMove(x, y+2)) {
-              lst.push([x, y+2]);
+        case `p${color}`:
+          let mod = turn ? -1 : 1;
+          let startPoint = turn ? 6 : 1;
+          if (!board[x][y+1*mod] && canMove(x, y+1*mod)) {
+            lst.push([x, y+1*mod]);
+            if (y === startPoint && !board[x][y+2*mod] && canMove(x, y+2*mod)) {
+              lst.push([x, y+2*mod]);
             }
           }
-          if (canMove(x-1, y+1) && board[x-1][y+1]) {
-            lst.push([x-1, y+1]);
+          if (canMove(x-1, y+1*mod) && board[x-1][y+1*mod]) {
+            lst.push([x-1, y+1*mod]);
           }
-          if (canMove(x+1, y+1) && board[x+1][y+1]) {
-            lst.push([x+1, y+1]);
+          if (canMove(x+1, y+1*mod) && board[x+1][y+1*mod]) {
+            lst.push([x+1, y+1*mod]);
           }
           setDestinationSquares(lst);
           break;
-        case 'pb':
-          if (!board[x][y-1] && canMove(x, y-1)) {
-            lst.push([x,y-1]);
-            if (y === 6 && !board[x][y-2] && canMove(x, y-2)) {
-              lst.push([x, y-2]);
-            }
-          }
-          if (canMove(x-1, y-1) && board[x-1][y-1]) {
-            lst.push([x-1, y-1]);
-          }
-          if (canMove(x+1,y-1) && board[x+1][y-1]) {
-            lst.push([x+1, y-1]);
-          }
-          setDestinationSquares(lst);
-          break;
-        case 'bw':
-        case 'bb':
+        case `b${color}`:
           for (let i = 1; i <= spacesLen(x, y, 4); i++) {
             if (canMove(x-i, y+i)) {
               lst.push([x-i, y+i]);
@@ -389,8 +398,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
-        case 'nw':
-        case 'nb':
+        case `n${color}`:
           if (canMove(x-1, y+2)) {
             lst.push([x-1, y+2]);
           }
@@ -417,8 +425,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst)
           break;
-        case 'rw':
-        case 'rb':
+        case `r${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
             if (canMove(x, y+i)) {
               lst.push([x, y+i]);
@@ -453,8 +460,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
-        case 'qw':
-        case 'qb':
+        case `q${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
             if (canMove(x, y+i)) {
               lst.push([x, y+i]);
@@ -521,8 +527,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
-        case 'kw':
-        case 'kb':
+        case `k${color}`:
           if (canMove(x, y+1)) {
             lst.push([x, y+1]);
           }
@@ -569,7 +574,6 @@ export default function ChessBoard() {
       }
     } else if (destinated) {
       let castle = false;
-      let promotion = false;
       if (color === 'w') {
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) {
@@ -612,24 +616,32 @@ export default function ChessBoard() {
       const updatedBoard = board.map(row => [...row]);
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
-      if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] - 2) {
-        updatedBoard[x+1][y] = updatedBoard[0][y];
-        updatedBoard[0][y] = null;
-        castle = true;
-      } else if (board[selectedSquare[0]][selectedSquare[1]][0] === 'k' && x === selectedSquare[0] + 2) {
-        updatedBoard[x-1][y] = updatedBoard[0][y];
-        updatedBoard[7][y] = null;
-        castle = true;
+      if (board[selectedSquare[0]][selectedSquare[1]] === `k${color}`) {
+        if (x === selectedSquare[0] - 2) {
+          updatedBoard[x+1][y] = updatedBoard[0][y];
+          updatedBoard[0][y] = null;
+          castle = true;
+        } else if (x === selectedSquare[0] + 2) {
+          updatedBoard[x-1][y] = updatedBoard[0][y];
+          updatedBoard[7][y] = null;
+          castle = true;
+        }
+      } else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}`) {
+        let promotionPoint = turn ? 0 : 7;
+        if (y === promotionPoint) {
+          setPromotion(true);
+        }
       }
-      if (isKingInCheck(updatedBoard, true)) {
+      if (kingInCheck(updatedBoard, true)) {
         checkSoundEffect.play();
       } else if (castle) {
         castleSoundEffect.play();
-      } else if (board[x][y]) {
-        captureSoundEffect.play();
-        addPoint(board[x][y]);
-      } else {
+      } else if (!board[x][y]) {
         moveSoundEffect.play();
+      }
+      if (board[x][y]) {
+        addPoint(board[x][y]);
+        captureSoundEffect.play();
       }
       setBoard(updatedBoard);
       setSelectedSquare(null);
@@ -654,7 +666,7 @@ export default function ChessBoard() {
   }
   return (
     <Stack direction="row">
-      {promotion && <PromotionCard />}
+      {promotion && <PromotionCard color={!turn} />}
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
