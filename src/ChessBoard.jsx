@@ -237,37 +237,23 @@ export default function ChessBoard() {
     4 = topLeft, 5 = topRight, 6 = bottomRight, 7 = bottomLeft
     */
     switch (direction) {
-      case 0:
-        return 7 - y;
-      case 1:
-        return 7 - x;
-      case 2:
-        return y;
-      case 3:
-        return x;
-      case 4:
-        return Math.min(7 - y, x);
-      case 5:
-        return Math.min(7 - y, 7 - x);
-      case 6:
-        return Math.min(y, 7 - x);
-      case 7:
-        return Math.min(y, x);
-      default:
-        throw new Error("Invalid direction!");
+      case 0: return 7 - y;
+      case 1: return 7 - x;
+      case 2: return y;
+      case 3: return x;
+      case 4: return Math.min(7 - y, x);
+      case 5: return Math.min(7 - y, 7 - x);
+      case 6: return Math.min(y, 7 - x);
+      case 7: return Math.min(y, x);
+      default: throw new Error("Invalid direction!");
     }
   }
-
-  function withinBounds(x, y) {
-    return x >= 0 && x <= 7 && y >= 0 && y <= 7
-  }
+  // Checks if move is within bounds
+  const withinBounds = (x, y) => x >= 0 && x <= 7 && y >= 0 && y <= 7
   // Fundamentally canMove but does not consider king in check conditions
-  function canPotentialMove(toX, toY) {
-    return withinBounds(toX, toY) && board[toX][toY]?.[1] !== color;
-  }
+  const canPotentialMove = (toX, toY) => withinBounds(toX, toY) && board[toX][toY]?.[1] !== color;
   function canMove(x, y, toX, toY) {
     if (!canPotentialMove(toX, toY)) return false;
-    // At this point, the move is possible as long as it does not leave the king in check
     // Now check if king is in check
     let tempBoard = board.map(row => [...row]);
     tempBoard[toX][toY] = tempBoard[x][y];
@@ -514,13 +500,9 @@ export default function ChessBoard() {
       } else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) {
         setPromotion(true); // put in the rest
       }
-      if (kingInCheck(updatedBoard, true)) { // If the opposing team is in check...
-        checkSoundEffect.play();
-      } else if (castle) {
-        castleSoundEffect.play();
-      } else if (!board[x][y]) {
-        moveSoundEffect.play();
-      }
+      if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // If the opposing team is in check...
+      else if (castle) castleSoundEffect.play();
+      else if (!board[x][y]) moveSoundEffect.play();
       if (board[x][y]) {
         addPoint(board[x][y]);
         captureSoundEffect.play();
@@ -537,9 +519,7 @@ export default function ChessBoard() {
   let destinationColumns = [[],[],[],[],[],[],[],[]]; // Destinated squares for each column - index is column number
   for (let x = 0; x < 8; x++) {
     for (let coordinate in destinationSquares) {
-      if (destinationSquares[coordinate][0] === x) {
-        destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords to destinationColumns in the correct indexes
-      }
+      if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords to destinationColumns in the correct indexes
     }
   }
   return (
