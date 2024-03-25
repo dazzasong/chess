@@ -189,7 +189,7 @@ export default function ChessBoard() {
   const [pointsBlack, setPointsBlack] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
-  const [castleStateWhite, setCastleStateWhite] = React.useState(0);
+  const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const [promotion, setPromotion] = React.useState(false);
   const [promotionPiece, setPromotionPiece] = React.useState(null);
@@ -197,33 +197,33 @@ export default function ChessBoard() {
   const opposingColor = turn === -1 ? 'b' : 'w';
   function addPoint(pieceTaken) {
     switch (pieceTaken[0]) {
-      case 'p':
+      case 'p': // If pawn is taken...
         if (turn === 1) {
-          setPointsBlack(pointsBlack + 1);
+          setPointsBlack(pointsBlack + 1); // pawn is worth 1 point
         } else {
-          setPointsWhite(pointsWhite + 1);
+          setPointsWhite(pointsWhite + 1); // same for other team
         }
         break;
-      case 'b':
+      case 'b': // If bishop or knight is taken...
       case 'n':
         if (turn === 1) {
-          setPointsBlack(pointsBlack + 3);
+          setPointsBlack(pointsBlack + 3); // bishop is worth 3 points
         } else {
-          setPointsWhite(pointsWhite + 3);
+          setPointsWhite(pointsWhite + 3); // same for other team
         }
         break;
-      case 'r':
+      case 'r': // If rook is taken...
         if (turn === 1) {
-          setPointsBlack(pointsBlack + 5);
+          setPointsBlack(pointsBlack + 5); // rook is worth 5 points
         } else {
-          setPointsWhite(pointsWhite + 5);
+          setPointsWhite(pointsWhite + 5); // same for other team
         }
         break;
-      case 'q':
+      case 'q': // If queen is taken...
         if (turn === 1) {
-          setPointsBlack(pointsBlack + 9);
+          setPointsBlack(pointsBlack + 9); // queen is worth 9 points
         } else {
-          setPointsWhite(pointsWhite + 9);
+          setPointsWhite(pointsWhite + 9); // same for other team
         }
         break;
       default:
@@ -349,10 +349,11 @@ export default function ChessBoard() {
     return false;
   }
   function clickSquare(x, y, selected, destinated) {
-    if (board[x][y]?.[1] === color && !selected && !destinated) {
+    if (board[x][y]?.[1] === color && !selected && !destinated) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
-      let lst = [];
+      let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
       switch (board[x][y]) {
+        // Pawn moves
         case `p${color}`:
           let mod = -turn;
           let startPoint = turn === 1 ? 6 : 1;
@@ -362,6 +363,7 @@ export default function ChessBoard() {
           if (canMove(x, y, x+1, y+1*mod) && board[x+1][y+1*mod]) lst.push([x+1, y+1*mod]);
           setDestinationSquares(lst);
           break;
+        // Bishop moves
         case `b${color}`:
           for (let i = 1; i <= spacesLen(x, y, 4); i++) {
             if (canMove(x, y, x-i, y+i)) lst.push([x-i, y+i]); 
@@ -381,6 +383,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
+        // Knight moves
         case `n${color}`:
           if (canMove(x, y, x-1, y+2)) lst.push([x-1, y+2]);
           if (canMove(x, y, x+1, y+2)) lst.push([x+1, y+2]);
@@ -392,6 +395,7 @@ export default function ChessBoard() {
           if (canMove(x, y, x-2, y+1)) lst.push([x-2, y+1]);
           setDestinationSquares(lst);
           break;
+        // Rook moves
         case `r${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
             if (canMove(x, y, x, y+i)) lst.push([x, y+i]);
@@ -411,6 +415,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
+        // Queen moves
         case `q${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
             if (canMove(x, y, x, y+i)) lst.push([x, y+i]);
@@ -446,6 +451,7 @@ export default function ChessBoard() {
           }
           setDestinationSquares(lst);
           break;
+        // King moves
         case `k${color}`:
           if (canMove(x, y, x, y+1)) lst.push([x, y+1]);
           if (canMove(x, y, x+1, y)) lst.push([x+1, y]);
@@ -467,8 +473,9 @@ export default function ChessBoard() {
         default:
           throw new Error("Invalid piece!");
       }
-    } else if (destinated) {
+    } else if (destinated) { // If the clicked square is destinated...
       let castle = false;
+      // Setting states for castling...
       if (color === 'w') {
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) setCastleStateWhite(1);
@@ -493,6 +500,7 @@ export default function ChessBoard() {
       const updatedBoard = board.map(row => [...row]);
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
+      // Checking for castling
       if (board[selectedSquare[0]][selectedSquare[1]] === `k${color}`) {
         if (x === selectedSquare[0] - 2) {
           updatedBoard[x+1][y] = updatedBoard[0][y];
@@ -506,7 +514,7 @@ export default function ChessBoard() {
       } else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) {
         setPromotion(true); // put in the rest
       }
-      if (kingInCheck(updatedBoard, true)) {
+      if (kingInCheck(updatedBoard, true)) { // If the opposing team is in check...
         checkSoundEffect.play();
       } else if (castle) {
         castleSoundEffect.play();
@@ -521,16 +529,16 @@ export default function ChessBoard() {
       setSelectedSquare(null);
       setDestinationSquares(null);
       setTurn(-turn);
-    } else {
+    } else { // Otherwise, if the square is empty or not their turn...
       setSelectedSquare(null);
       setDestinationSquares(null);
     }
   }
-  let destinationColumns = [[],[],[],[],[],[],[],[]];
+  let destinationColumns = [[],[],[],[],[],[],[],[]]; // Destinated squares for each column - index is column number
   for (let x = 0; x < 8; x++) {
     for (let coordinate in destinationSquares) {
       if (destinationSquares[coordinate][0] === x) {
-        destinationColumns[x].push(destinationSquares[coordinate][1]);
+        destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords to destinationColumns in the correct indexes
       }
     }
   }
