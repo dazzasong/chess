@@ -236,19 +236,26 @@ export default function ChessBoard() {
         padding={1}
         spacing={2}
       >
-        <Typography fontSize={16} fontWeight="bold">
+        <Typography fontSize={16} fontWeight="bold"
+          sx={{
+            userSelect: "none"
+          }}
+        >
           Promote to
         </Typography>
-        <IconButton onClick={() => promote('q')}>
+        <IconButton onClick={() => promote('q')} disableRipple>
           <img src={promotionsrc('q')} alt={color ? "Black Queen" : "White Queen"} />
         </IconButton>
-        <IconButton onClick={() => promote('r')}>
+        -
+        <IconButton onClick={() => promote('r')} disableRipple>
           <img src={promotionsrc('r')} alt={color ? "Black Rook" : "White Rook"} />
         </IconButton>
-        <IconButton onClick={() => promote('n')}>
+        -
+        <IconButton onClick={() => promote('n')} disableRipple>
           <img src={promotionsrc('n')} alt={color ? "Black Knight" : "White Knight"} />
         </IconButton>
-        <IconButton onClick={() => promote('b')}>
+        -
+        <IconButton onClick={() => promote('b')} disableRipple>
           <img src={promotionsrc('b')} alt={color ? "Black Bishop" : "White Bishop"} />
         </IconButton>
       </Stack>
