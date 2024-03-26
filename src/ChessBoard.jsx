@@ -169,6 +169,7 @@ export default function ChessBoard() {
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const [promotingSquare, setPromotingSquare] = React.useState(null);
+  const [enPassantSquare, setEnpassantSquare] = React.useState(null);
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
   function addPoint(pieceTaken, opposite = false) {
@@ -378,6 +379,8 @@ export default function ChessBoard() {
           if (y === startPoint && !board[x][y+2*mod] && canMove(x, y, x, y+2*mod)) lst.push([x, y+2*mod]);
           if (canMove(x, y, x-1, y+1*mod) && board[x-1][y+1*mod]) lst.push([x-1, y+1*mod]);
           if (canMove(x, y, x+1, y+1*mod) && board[x+1][y+1*mod]) lst.push([x+1, y+1*mod]);
+          if (canMove(x, y, x-1, y+1*mod) && x === enPassantSquare?.[0] + 1 && y === enPassantSquare[1]) lst.push([x-1, y+1*mod]);
+          if (canMove(x, y, x+1, y+1*mod) && x === enPassantSquare?.[0] - 1 && y === enPassantSquare[1]) lst.push([x+1, y+1*mod]);
           setDestinationSquares(lst);
           break;
         // Bishop moves
@@ -514,6 +517,8 @@ export default function ChessBoard() {
         }
         if (selectedSquare[0] === 4 && selectedSquare[1] === 7) setCastleStateBlack(2);
       }
+      // Checks if pawn moved 2 squares forward
+      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && (y === selectedSquare[1] + 2 || y === selectedSquare[1] - 2)) setEnpassantSquare([x, y]);
       const updatedBoard = board.map(row => [...row]); // Creates copy of board - changes will be made to this one
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
@@ -529,9 +534,14 @@ export default function ChessBoard() {
           castle = true;
         }
       }
-      // Checks for promoting
+      // Checks for promotion
       if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]);
-      if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
+      // Checks for en passant
+      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) {
+        updatedBoard[enPassantSquare[0]][enPassantSquare[1]] = null;
+        addPoint('p');
+        captureSoundEffect.play();
+      } else if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
       else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
       else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
       if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
@@ -541,9 +551,12 @@ export default function ChessBoard() {
       // Sets board state to updated board and switches turn
       setBoard(updatedBoard);
       setTurn(-turn);
-      // Removes selectedSquares and destinationSquares
+      // Sets selectedSquares, destinationSquares, enpassantSquare, to null
       setSelectedSquare(null);
       setDestinationSquares(null);
+      if (enPassantSquare) {
+        setEnpassantSquare(null);
+      }
     } else { // Otherwise, if the square is empty or not their turn...
       setSelectedSquare(null);
       setDestinationSquares(null);
