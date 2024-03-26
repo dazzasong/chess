@@ -51,6 +51,7 @@ function SideBar({ pointsWhite, pointsBlack }) {
 
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
+  const [highlighted, setHighlighted] = React.useState(false);
   let src;
   let bgcolor;
   switch (piece) {
@@ -93,16 +94,16 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
     default:
       src = null;
   }
-  if (shaded) {
-    bgcolor = "#B58863";
-  } else {
-    bgcolor = "#F0D9B5";
-  }
-  if (selected) {
-    bgcolor = "#ffff77";
+  if (shaded) bgcolor = "#B58863";
+  else bgcolor = "#F0D9B5";
+  if (highlighted) bgcolor = "#ffff99";
+  if (selected) bgcolor = "#ffff77";
+  function handleRightClick(event) {
+    event.preventDefault(); // Prevent the default context menu behavior
+    setHighlighted(!highlighted); // Toggle the highlighted state of the square
   }
   return (
-    <div onClick={() => clickSquare(x, y, selected, destinated)}>
+    <div onClick={() => clickSquare(x, y, selected, destinated)} onContextMenu={handleRightClick}>
       <Stack
         width={64}
         height={64}
