@@ -30,7 +30,7 @@ const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
 function SideBar({ pointsWhite, pointsBlack }) {
   return (
-    <Stack width={200} bgcolor="#1A181B" paddingLeft={1} spacing={59}>
+    <Stack width={200} bgcolor="#4B4847" paddingLeft={1} spacing={59}>
       <Typography fontSize={20} color="white"
         sx={{
           userSelect: "none"
@@ -94,12 +94,12 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
       src = null;
   }
   if (shaded) {
-    bgcolor = "darkgoldenrod";
+    bgcolor = "#B58863";
   } else {
-    bgcolor = "burlywood";
+    bgcolor = "#F0D9B5";
   }
   if (selected) {
-    bgcolor = "#ffff66";
+    bgcolor = "#ffff77";
   }
   return (
     <div onClick={() => clickSquare(x, y, selected, destinated)}>
