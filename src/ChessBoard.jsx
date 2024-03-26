@@ -30,44 +30,21 @@ const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
 function SideBar({ pointsWhite, pointsBlack }) {
   return (
-    <Stack spacing={59}>
-      <Typography fontSize={20} fontWeight="bold"
+    <Stack width={200} bgcolor="#1A181B" paddingLeft={1} spacing={59}>
+      <Typography fontSize={20} color="white"
         sx={{
           userSelect: "none"
         }}
       >
-        {pointsBlack}
+        {pointsBlack} pts
       </Typography>
-      <Typography fontSize={20} fontWeight="bold"
+      <Typography fontSize={20} color="white"
         sx={{
           userSelect: "none"
         }}
       >
-        {pointsWhite}
+        {pointsWhite} pts
       </Typography>
-    </Stack>
-  )
-}
-
-function PromotionCard({ color, setPromotionPiece }) {
-  return (
-    <Stack
-      bgcolor={"gray"}
-      border={"solid"}
-      spacing={2}
-    >
-      <IconButton onClick={setPromotionPiece(color ? 'qb' : 'qw')}>
-        <img src={color ? blackQueen : whiteQueen} alt={color ? "Black Queen" : "White Queen"} />
-      </IconButton>
-      <IconButton onClick={setPromotionPiece(color ? 'rb' : 'rw')}>
-        <img src={color ? blackRook : whiteRook} alt={color ? "Black Rook" : "White Rook"} />
-      </IconButton>
-      <IconButton onClick={setPromotionPiece(color ? 'nb' : 'nw')}>
-        <img src={color ? blackKnight : whiteKnight} alt={color ? "Black Knight" : "White Knight"} />
-      </IconButton>
-      <IconButton onClick={setPromotionPiece(color ? 'bb' : 'bw')}>
-        <img src={color ? blackBishop : whiteBishop} alt={color ? "Black Bishop" : "White Bishop"} />
-      </IconButton>
     </Stack>
   )
 }
@@ -191,44 +168,91 @@ export default function ChessBoard() {
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
-  const [promotion, setPromotion] = React.useState(false);
-  const [promotionPiece, setPromotionPiece] = React.useState(null);
+  const [promotingSquare, setPromotingSquare] = React.useState(null);
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
-  function addPoint(pieceTaken) {
+  function addPoint(pieceTaken, opposite = false) {
+    const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
       case 'p': // If pawn is taken...
-        if (turn === 1) {
-          setPointsBlack(pointsBlack + 1); // pawn is worth 1 point
-        } else {
-          setPointsWhite(pointsWhite + 1); // same for other team
-        }
+        if (condition) setPointsBlack(pointsBlack + 1);
+        else setPointsWhite(pointsWhite + 1)
         break;
       case 'b': // If bishop or knight is taken...
       case 'n':
-        if (turn === 1) {
-          setPointsBlack(pointsBlack + 3); // bishop is worth 3 points
-        } else {
-          setPointsWhite(pointsWhite + 3); // same for other team
-        }
+        if (condition) setPointsBlack(pointsBlack + 3);
+        else setPointsWhite(pointsWhite + 3);
         break;
       case 'r': // If rook is taken...
-        if (turn === 1) {
-          setPointsBlack(pointsBlack + 5); // rook is worth 5 points
-        } else {
-          setPointsWhite(pointsWhite + 5); // same for other team
-        }
+        if (condition) setPointsBlack(pointsBlack + 5);
+        else setPointsWhite(pointsWhite + 5);
         break;
       case 'q': // If queen is taken...
-        if (turn === 1) {
-          setPointsBlack(pointsBlack + 9); // queen is worth 9 points
-        } else {
-          setPointsWhite(pointsWhite + 9); // same for other team
-        }
+        if (condition) setPointsBlack(pointsBlack + 9);
+        else setPointsWhite(pointsWhite + 9);
         break;
       default:
         throw new Error("Invalid pieceTaken!");
     }
+  }
+  function PromotionCard() {
+    function promote(promotionPiece) {
+      let updatedBoard = board.map(row => [...row]);
+      updatedBoard[promotingSquare[0]][promotingSquare[1]] = `${promotionPiece}${opposingColor}`;
+      setBoard(updatedBoard);
+      setPromotingSquare(null);
+      promoteSoundEffect.play();
+      switch (promotionPiece) {
+        case 'q':
+          addPoint('q', true);
+          break;
+        case 'r':
+          addPoint('r', true);
+          break;
+        case 'n':
+        case 'b':
+          addPoint('n', true);
+          break;
+        default: throw new Error("Invalid promotionPiece!");
+      }
+    }
+    function promotionsrc(piece) {
+      switch (piece) {
+        case 'q':
+          return turn === 1 ? whiteQueen : blackQueen;
+        case 'r':
+          return turn === 1 ? whiteRook : blackRook;
+        case 'n':
+          return turn === 1 ? whiteKnight : blackKnight;
+        case 'b':
+          return turn === 1 ? whiteBishop : blackBishop;
+        default: throw new Error("Invalid piece!");
+      }
+    }
+    return (
+      <Stack
+        bgcolor={"goldenrod"}
+        border={"solid"}
+        padding={1}
+        spacing={2}
+      >
+        <Typography fontSize={16} fontWeight="bold">
+          Promote to
+        </Typography>
+        <IconButton onClick={() => promote('q')}>
+          <img src={promotionsrc('q')} alt={color ? "Black Queen" : "White Queen"} />
+        </IconButton>
+        <IconButton onClick={() => promote('r')}>
+          <img src={promotionsrc('r')} alt={color ? "Black Rook" : "White Rook"} />
+        </IconButton>
+        <IconButton onClick={() => promote('n')}>
+          <img src={promotionsrc('n')} alt={color ? "Black Knight" : "White Knight"} />
+        </IconButton>
+        <IconButton onClick={() => promote('b')}>
+          <img src={promotionsrc('b')} alt={color ? "Black Bishop" : "White Bishop"} />
+        </IconButton>
+      </Stack>
+    )
   }
   function spacesLen(x, y, direction) {
     /*
@@ -270,7 +294,7 @@ export default function ChessBoard() {
         }
       }
     }
-    const otherColor = opposing ? color : opposingColor;
+    const usedColor = opposing ? color : opposingColor;
     /* 
     We want to test if any opposing pieces are able to capture the king in the current board state.
     The king is in check if:
@@ -279,63 +303,63 @@ export default function ChessBoard() {
     */
     const kicTurn = opposing ? -turn : turn;
     // Pawn
-    if ((canPotentialMove(kingX-1, kingY-kicTurn) && board[kingX-1][kingY-kicTurn] === `p${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY-kicTurn) && board[kingX+1][kingY-kicTurn] === `p${otherColor}`)) return true;
+    if ((canPotentialMove(kingX-1, kingY-kicTurn) && board[kingX-1][kingY-kicTurn] === `p${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY-kicTurn) && board[kingX+1][kingY-kicTurn] === `p${usedColor}`)) return true;
     // Knight
-    if ((canPotentialMove(kingX-1, kingY+2) && board[kingX-1][kingY+2] === `n${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY+2) && board[kingX+1][kingY+2] === `n${otherColor}`) ||
-        (canPotentialMove(kingX+2, kingY+1) && board[kingX+2][kingY+1] === `n${otherColor}`) ||
-        (canPotentialMove(kingX+2, kingY-1) && board[kingX+2][kingY-1] === `n${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY-2) && board[kingX+1][kingY-2] === `n${otherColor}`) ||
-        (canPotentialMove(kingX-1, kingY-2) && board[kingX-1][kingY-2] === `n${otherColor}`) ||
-        (canPotentialMove(kingX-2, kingY-1) && board[kingX-2][kingY-1] === `n${otherColor}`) ||
-        (canPotentialMove(kingX-2, kingY+1) && board[kingX-2][kingY+1] === `n${otherColor}`)) return true;
+    if ((canPotentialMove(kingX-1, kingY+2) && board[kingX-1][kingY+2] === `n${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY+2) && board[kingX+1][kingY+2] === `n${usedColor}`) ||
+        (canPotentialMove(kingX+2, kingY+1) && board[kingX+2][kingY+1] === `n${usedColor}`) ||
+        (canPotentialMove(kingX+2, kingY-1) && board[kingX+2][kingY-1] === `n${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY-2) && board[kingX+1][kingY-2] === `n${usedColor}`) ||
+        (canPotentialMove(kingX-1, kingY-2) && board[kingX-1][kingY-2] === `n${usedColor}`) ||
+        (canPotentialMove(kingX-2, kingY-1) && board[kingX-2][kingY-1] === `n${usedColor}`) ||
+        (canPotentialMove(kingX-2, kingY+1) && board[kingX-2][kingY+1] === `n${usedColor}`)) return true;
     // King
-    if ((canPotentialMove(kingX, kingY+1) && board[kingX][kingY+1] === `k${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY) && board[kingX+1][kingY] === `k${otherColor}`) ||
-        (canPotentialMove(kingX, kingY-1) && board[kingX][kingY-1] === `k${otherColor}`) ||
-        (canPotentialMove(kingX-1, kingY) && board[kingX-1][kingY] === `k${otherColor}`) ||
-        (canPotentialMove(kingX-1, kingY+1) && board[kingX-1][kingY+1] === `k${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY+1) && board[kingX+1][kingY+1] === `k${otherColor}`) ||
-        (canPotentialMove(kingX+1, kingY-1) && board[kingX+1][kingY-1] === `k${otherColor}`) ||
-        (canPotentialMove(kingX-1, kingY-1) && board[kingX-1][kingY-1] === `k${otherColor}`)) return true;
+    if ((canPotentialMove(kingX, kingY+1) && board[kingX][kingY+1] === `k${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY) && board[kingX+1][kingY] === `k${usedColor}`) ||
+        (canPotentialMove(kingX, kingY-1) && board[kingX][kingY-1] === `k${usedColor}`) ||
+        (canPotentialMove(kingX-1, kingY) && board[kingX-1][kingY] === `k${usedColor}`) ||
+        (canPotentialMove(kingX-1, kingY+1) && board[kingX-1][kingY+1] === `k${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY+1) && board[kingX+1][kingY+1] === `k${usedColor}`) ||
+        (canPotentialMove(kingX+1, kingY-1) && board[kingX+1][kingY-1] === `k${usedColor}`) ||
+        (canPotentialMove(kingX-1, kingY-1) && board[kingX-1][kingY-1] === `k${usedColor}`)) return true;
     // Rook and Queen
     for (let i = 1; i <= spacesLen(kingX, kingY, 0); i++) {
-      if (board[kingX][kingY+i] === `r${otherColor}` || board[kingX][kingY+i] === `q${otherColor}`) return true;
+      if (board[kingX][kingY+i] === `r${usedColor}` || board[kingX][kingY+i] === `q${usedColor}`) return true;
       if (board[kingX][kingY+i]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 1); i++) {
-      if (board[kingX+i][kingY] === `r${otherColor}` || board[kingX+i][kingY] === `q${otherColor}`) return true;
+      if (board[kingX+i][kingY] === `r${usedColor}` || board[kingX+i][kingY] === `q${usedColor}`) return true;
       if (board[kingX+i][kingY]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 2); i++) {
-      if (board[kingX][kingY-i] === `r${otherColor}` || board[kingX][kingY-i] === `q${otherColor}`) return true;
+      if (board[kingX][kingY-i] === `r${usedColor}` || board[kingX][kingY-i] === `q${usedColor}`) return true;
       if (board[kingX][kingY-i]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 3); i++) {
-      if (board[kingX-i][kingY] === `r${otherColor}` || board[kingX-i][kingY] === `q${otherColor}`) return true;
+      if (board[kingX-i][kingY] === `r${usedColor}` || board[kingX-i][kingY] === `q${usedColor}`) return true;
       if (board[kingX-i][kingY]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
-      if (board[kingX-i][kingY+i] === `b${otherColor}` || board[kingX-i][kingY+i] === `q${otherColor}`) return true;
+      if (board[kingX-i][kingY+i] === `b${usedColor}` || board[kingX-i][kingY+i] === `q${usedColor}`) return true;
       if (board[kingX-i][kingY+i]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 5); i++) {
-      if (board[kingX+i][kingY+i] === `b${otherColor}` || board[kingX+i][kingY+i] === `q${otherColor}`) return true;
+      if (board[kingX+i][kingY+i] === `b${usedColor}` || board[kingX+i][kingY+i] === `q${usedColor}`) return true;
       if (board[kingX+i][kingY+i]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 6); i++) {
-      if (board[kingX+i][kingY-i] === `b${otherColor}` || board[kingX+i][kingY-i] === `q${otherColor}`) return true;
+      if (board[kingX+i][kingY-i] === `b${usedColor}` || board[kingX+i][kingY-i] === `q${usedColor}`) return true;
       if (board[kingX+i][kingY-i]) break;
     }
     for (let i = 1; i <= spacesLen(kingX, kingY, 7); i++) {
-      if (board[kingX-i][kingY-i] === `b${otherColor}` || board[kingX-i][kingY-i] === `q${otherColor}`) return true;
+      if (board[kingX-i][kingY-i] === `b${usedColor}` || board[kingX-i][kingY-i] === `q${usedColor}`) return true;
       if (board[kingX-i][kingY-i]) break;
     }
     return false;
   }
   function clickSquare(x, y, selected, destinated) {
-    if (board[x][y]?.[1] === color && !selected && !destinated) { // If the clicked square has a piece and is their current turn...
+    if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
       let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
       switch (board[x][y]) {
@@ -461,8 +485,8 @@ export default function ChessBoard() {
       }
     } else if (destinated) { // If the clicked square is destinated...
       let castle = false;
-      // Setting states for castling...
-      if (color === 'w') {
+      // Setting states for castling
+      if (color === 'w') { // If white's turn...
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) setCastleStateWhite(1);
           else if (selectedSquare[0] === 7 && selectedSquare[1] === 0) setCastleStateWhite(-1);
@@ -472,7 +496,7 @@ export default function ChessBoard() {
           if (selectedSquare[0] === 7 && selectedSquare[1] === 0) setCastleStateWhite(2);
         }
         if (selectedSquare[0] === 4 && selectedSquare[1] === 0) setCastleStateWhite(2);
-      } else if (color === 'b') {
+      } else if (color === 'b') { // If black's turn...
         if (castleStateBlack === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 7) setCastleStateBlack(1);
           else if (selectedSquare[0] === 7 && selectedSquare[1] === 7) setCastleStateBlack(-1);
@@ -483,10 +507,10 @@ export default function ChessBoard() {
         }
         if (selectedSquare[0] === 4 && selectedSquare[1] === 7) setCastleStateBlack(2);
       }
-      const updatedBoard = board.map(row => [...row]);
+      const updatedBoard = board.map(row => [...row]); // Creates copy of board - changes will be made to this one
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
-      // Checking for castling
+      // Checks for castling
       if (board[selectedSquare[0]][selectedSquare[1]] === `k${color}`) {
         if (x === selectedSquare[0] - 2) {
           updatedBoard[x+1][y] = updatedBoard[0][y];
@@ -497,20 +521,22 @@ export default function ChessBoard() {
           updatedBoard[7][y] = null;
           castle = true;
         }
-      } else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) {
-        setPromotion(true); // put in the rest
       }
-      if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // If the opposing team is in check...
-      else if (castle) castleSoundEffect.play();
-      else if (!board[x][y]) moveSoundEffect.play();
-      if (board[x][y]) {
+      // Checks for promoting
+      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]);
+      if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
+      else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
+      else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
+      if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
         addPoint(board[x][y]);
         captureSoundEffect.play();
       }
+      // Sets board state to updated board and switches turn
       setBoard(updatedBoard);
+      setTurn(-turn);
+      // Removes selectedSquares and destinationSquares
       setSelectedSquare(null);
       setDestinationSquares(null);
-      setTurn(-turn);
     } else { // Otherwise, if the square is empty or not their turn...
       setSelectedSquare(null);
       setDestinationSquares(null);
@@ -524,7 +550,7 @@ export default function ChessBoard() {
   }
   return (
     <Stack direction="row">
-      {promotion && <PromotionCard color={turn === -1} setPromotionPiece={setPromotionPiece} />}
+      {promotingSquare && <PromotionCard />}
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
