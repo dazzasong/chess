@@ -28,30 +28,51 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function SideBar({ pointsWhite, pointsBlack }) {
+function Timer() {
+  const [seconds, setSeconds] = React.useState(600);
+  React.useEffect(() => {
+    const interval = setInterval(() => {setSeconds(prevSeconds => prevSeconds - 1)}, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
   return (
-    <Stack width={200} bgcolor="#4B4847" paddingLeft={1} spacing={59}>
-      <Typography fontSize={20} color="white"
-        sx={{
-          userSelect: "none"
-        }}
-      >
-        {pointsBlack} pts
+    <Box>
+      <Typography >
+        {minutes < 10 ? `0${minutes}` : minutes}:{remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}
       </Typography>
-      <Typography fontSize={20} color="white"
-        sx={{
-          userSelect: "none"
-        }}
-      >
-        {pointsWhite} pts
-      </Typography>
+    </Box>
+  );
+}
+
+function SideBar({ pointsWhite, pointsBlack, timer }) {
+  return (
+    <Stack bgcolor="#4B4847" height={495} paddingLeft={1}>
+      <Stack direction="row">
+        <Typography fontSize={20} color="white"
+          sx={{
+            userSelect: "none"
+          }}
+        >
+          {pointsBlack} pts
+        </Typography>
+        <Timer />
+      </Stack>
+      <Stack direction="row">
+        <Typography fontSize={20} color="white"
+          sx={{
+            userSelect: "none"
+          }}
+        >
+          {pointsWhite} pts
+        </Typography>
+      </Stack>
     </Stack>
   )
 }
 
-function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
+function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSquare, rightClickSquare }) {
   const shaded = (x + y) % 2 === 0;
-  const [highlighted, setHighlighted] = React.useState(false);
   let src;
   let bgcolor;
   switch (piece) {
@@ -98,12 +119,8 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   else bgcolor = "#F0D9B5";
   if (highlighted) bgcolor = "#ffff99";
   if (selected) bgcolor = "#ffff77";
-  function handleRightClick(event) {
-    event.preventDefault(); // Prevent the default context menu behavior
-    setHighlighted(!highlighted); // Toggle the highlighted state of the square
-  }
   return (
-    <div onClick={() => clickSquare(x, y, selected, destinated)} onContextMenu={handleRightClick}>
+    <div onClick={() => clickSquare(x, y, selected, destinated)} onContextMenu={() => rightClickSquare(x, y)}>
       <Stack
         width={64}
         height={64}
@@ -167,13 +184,14 @@ export default function ChessBoard() {
   const [pointsBlack, setPointsBlack] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
+  const [highlightedSquares, setHighlightedSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const [promotingSquare, setPromotingSquare] = React.useState(null);
   const [enPassantSquare, setEnpassantSquare] = React.useState(null);
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
-  function addPoint(pieceTaken, opposite = false) {
+  function addPoint(pieceTaken, opposite = false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
       case 'p': // If pawn is taken...
@@ -194,7 +212,8 @@ export default function ChessBoard() {
         else setPointsWhite(pointsWhite + 9);
         break;
       default:
-        throw new Error("Invalid pieceTaken!");
+        if (condition) setPointsBlack(pointsBlack + customPoint);
+        else setPointsWhite(pointsWhite + customPoint);
     }
   }
   function PromotionCard() {
@@ -206,14 +225,14 @@ export default function ChessBoard() {
       promoteSoundEffect.play();
       switch (promotionPiece) {
         case 'q':
-          addPoint('q', true);
+          addPoint(0, true, 8);
           break;
         case 'r':
-          addPoint('r', true);
+          addPoint(0, true, 4);
           break;
         case 'n':
         case 'b':
-          addPoint('n', true);
+          addPoint(0, true, 2);
           break;
         default: throw new Error("Invalid promotionPiece!");
       }
@@ -233,17 +252,19 @@ export default function ChessBoard() {
     }
     return (
       <Stack
-        bgcolor={"goldenrod"}
         border={"solid"}
         padding={1}
         spacing={2}
+        sx={{
+          backgroundImage: "linear-gradient(white, grey)"
+        }}
       >
         <Typography fontSize={16} fontWeight="bold"
           sx={{
             userSelect: "none"
           }}
         >
-          Promote to
+          Promote to..
         </Typography>
         <IconButton onClick={() => promote('q')} disableRipple>
           <img src={promotionsrc('q')} alt={color ? "Black Queen" : "White Queen"} />
@@ -367,7 +388,7 @@ export default function ChessBoard() {
     }
     return false;
   }
-  function clickSquare(x, y, selected, destinated) {
+  function clickSquare(x, y, selected, destinated) { // function when a square is clicked
     if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
       let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
@@ -563,17 +584,23 @@ export default function ChessBoard() {
       setDestinationSquares(null);
     }
   }
-  let destinationColumns = [[],[],[],[],[],[],[],[]]; // Destinated squares for each column - index is column number
+  function rightClickSquare(x, y) { // function when a square is right-clicked
+    setHighlightedSquares()
+    
+  }
+  // Distinated and highlighted squares for each column - index is column number
+  let destinationColumns = [[],[],[],[],[],[],[],[]];
+  let highlightColumns = [[],[],[],[],[],[],[],[]];
+  // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
   for (let x = 0; x < 8; x++) {
-    for (let coordinate in destinationSquares) {
-      if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords to destinationColumns in the correct indexes
-    }
+    for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]);
+    for (let coordinate in highlightedSquares) if (highlightedSquares[coordinate][0] === x) highlightColumns[x].push(highlightedSquares[coordinate][1]);
   }
   return (
     <Stack direction="row">
       {promotingSquare && <PromotionCard />}
       <Stack direction="row" boxShadow={10}>
-        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={selectedSquare && x === selectedSquare[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
+        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} rightClickSquare={rightClickSquare} />)}
       </Stack>
       <SideBar pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
     </Stack>
