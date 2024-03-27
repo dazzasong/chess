@@ -28,38 +28,38 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer() {
-  const [seconds, setSeconds] = React.useState(600);
-  React.useEffect(() => {
-    const interval = setInterval(() => {setSeconds(prevSeconds => prevSeconds - 1)}, 1000);
-    return () => clearInterval(interval);
-  }, []);
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = seconds % 60;
+function SideBar({ pointsWhite, pointsBlack }) {
+  function Timer({ turn }) {
+    const [seconds, setSeconds] = React.useState(600);
+    React.useEffect(() => {
+      const interval = setInterval(() => {setSeconds(prevSeconds => prevSeconds - 1)}, 1000);
+      return () => clearInterval(interval);
+    }, []);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return (
+      <Box>
+        <Typography color="white" fontSize={30}>
+          {minutes < 10 ? `0${minutes}` : minutes}:{remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}
+        </Typography>
+      </Box>
+    );
+  }
   return (
-    <Box>
-      <Typography >
-        {minutes < 10 ? `0${minutes}` : minutes}:{remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}
-      </Typography>
-    </Box>
-  );
-}
-
-function SideBar({ pointsWhite, pointsBlack, timer }) {
-  return (
-    <Stack bgcolor="#4B4847" height={495} paddingLeft={1}>
-      <Stack direction="row">
-        <Typography fontSize={20} color="white"
+    <Stack bgcolor="#4B4847" justifyContent="space-between" paddingX={1}>
+      <Stack>
+        <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
           }}
         >
           {pointsBlack} pts
         </Typography>
-        <Timer />
+        <Timer turn={1} />
       </Stack>
-      <Stack direction="row">
-        <Typography fontSize={20} color="white"
+      <Stack>
+        <Timer turn={-1} />
+        <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
           }}

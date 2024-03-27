@@ -11,7 +11,7 @@ export default function Header() {
         marginBottom: 2
       }}
     >
-      <Typography fontSize={40} component="h1" ml={2}
+      <Typography fontSize={40} ml={2}
         sx={{
           userSelect: "none"
         }}
