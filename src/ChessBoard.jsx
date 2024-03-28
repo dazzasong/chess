@@ -210,6 +210,24 @@ export default function ChessBoard() {
         else setPointsWhite(pointsWhite + customPoint);
     }
   }
+  function spacesLen(x, y, direction) {
+    /*
+    Directions:
+    0 = up, 1 = right, 2 = down, 3 = left,
+    4 = topLeft, 5 = topRight, 6 = bottomRight, 7 = bottomLeft
+    */
+    switch (direction) {
+      case 0: return 7 - y;
+      case 1: return 7 - x;
+      case 2: return y;
+      case 3: return x;
+      case 4: return Math.min(7 - y, x);
+      case 5: return Math.min(7 - y, 7 - x);
+      case 6: return Math.min(y, 7 - x);
+      case 7: return Math.min(y, x);
+      default: throw new Error("Invalid direction!");
+    }
+  }
   function PromotionCard() {
     function promote(promotionPiece) {
       let updatedBoard = board.map(row => [...row]);
@@ -278,29 +296,12 @@ export default function ChessBoard() {
       </Stack>
     )
   }
-  function spacesLen(x, y, direction) {
-    /*
-    Directions:
-    0 = up, 1 = right, 2 = down, 3 = left,
-    4 = topLeft, 5 = topRight, 6 = bottomRight, 7 = bottomLeft
-    */
-    switch (direction) {
-      case 0: return 7 - y;
-      case 1: return 7 - x;
-      case 2: return y;
-      case 3: return x;
-      case 4: return Math.min(7 - y, x);
-      case 5: return Math.min(7 - y, 7 - x);
-      case 6: return Math.min(y, 7 - x);
-      case 7: return Math.min(y, x);
-      default: throw new Error("Invalid direction!");
-    }
-  }
+  function clickSquare(x, y, selected, destinated) { // function when a square is clicked
   // Checks if move is within bounds
   const withinBounds = (x, y) => x >= 0 && x <= 7 && y >= 0 && y <= 7
   // Fundamentally canMove but does not consider king in check conditions
   const canPotentialMove = (toX, toY) => withinBounds(toX, toY) && board[toX][toY]?.[1] !== color;
-  function canMove(x, y, toX, toY) {
+  function canMove(toX, toY) {
     if (!canPotentialMove(toX, toY)) return false;
     // Now check if king is in check
     let tempBoard = board.map(row => [...row]);
@@ -382,7 +383,6 @@ export default function ChessBoard() {
     }
     return false;
   }
-  function clickSquare(x, y, selected, destinated) { // function when a square is clicked
     if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
       let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
@@ -391,62 +391,62 @@ export default function ChessBoard() {
         case `p${color}`:
           let mod = -turn;
           let startPoint = turn === 1 ? 6 : 1;
-          if (!board[x][y+1*mod] && canMove(x, y, x, y+1*mod)) lst.push([x, y+1*mod]);
-          if (y === startPoint && !board[x][y+2*mod] && canMove(x, y, x, y+2*mod)) lst.push([x, y+2*mod]);
-          if (canMove(x, y, x-1, y+1*mod) && board[x-1][y+1*mod]) lst.push([x-1, y+1*mod]);
-          if (canMove(x, y, x+1, y+1*mod) && board[x+1][y+1*mod]) lst.push([x+1, y+1*mod]);
-          if (canMove(x, y, x-1, y+1*mod) && x === enPassantSquare?.[0] + 1 && y === enPassantSquare[1]) lst.push([x-1, y+1*mod]);
-          if (canMove(x, y, x+1, y+1*mod) && x === enPassantSquare?.[0] - 1 && y === enPassantSquare[1]) lst.push([x+1, y+1*mod]);
+          if (!board[x][y+1*mod] && canMove(x, y+1*mod)) lst.push([x, y+1*mod]);
+          if (y === startPoint && !board[x][y+2*mod] && canMove(x, y+2*mod)) lst.push([x, y+2*mod]);
+          if (canMove(x-1, y+1*mod) && board[x-1][y+1*mod]) lst.push([x-1, y+1*mod]);
+          if (canMove(x+1, y+1*mod) && board[x+1][y+1*mod]) lst.push([x+1, y+1*mod]);
+          if (canMove(x-1, y+1*mod) && x === enPassantSquare?.[0] + 1 && y === enPassantSquare[1]) lst.push([x-1, y+1*mod]);
+          if (canMove(x+1, y+1*mod) && x === enPassantSquare?.[0] - 1 && y === enPassantSquare[1]) lst.push([x+1, y+1*mod]);
           setDestinationSquares(lst);
           break;
         // Bishop moves
         case `b${color}`:
           for (let i = 1; i <= spacesLen(x, y, 4); i++) {
-            if (canMove(x, y, x-i, y+i)) lst.push([x-i, y+i]); 
+            if (canMove(x-i, y+i)) lst.push([x-i, y+i]); 
             if (board[x-i][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 5); i++) {
-            if (canMove(x, y, x+i, y+i)) lst.push([x+i, y+i]);
+            if (canMove(x+i, y+i)) lst.push([x+i, y+i]);
             if (board[x+i][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 6); i++) {
-            if (canMove(x, y, x+i, y-i)) lst.push([x+i, y-i]);
+            if (canMove(x+i, y-i)) lst.push([x+i, y-i]);
             if (board[x+i][y-i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 7); i++) {
-            if (canMove(x, y, x-i, y-i)) lst.push([x-i, y-i]);
+            if (canMove(x-i, y-i)) lst.push([x-i, y-i]);
             if (board[x-i][y-i]) break;
           }
           setDestinationSquares(lst);
           break;
         // Knight moves
         case `n${color}`:
-          if (canMove(x, y, x-1, y+2)) lst.push([x-1, y+2]);
-          if (canMove(x, y, x+1, y+2)) lst.push([x+1, y+2]);
-          if (canMove(x, y, x+2, y+1)) lst.push([x+2, y+1]);
-          if (canMove(x, y, x+2, y-1)) lst.push([x+2, y-1]);
-          if (canMove(x, y, x+1, y-2)) lst.push([x+1, y-2]);
-          if (canMove(x, y, x-1, y-2)) lst.push([x-1, y-2]);
-          if (canMove(x, y, x-2, y-1)) lst.push([x-2, y-1]);
-          if (canMove(x, y, x-2, y+1)) lst.push([x-2, y+1]);
+          if (canMove(x-1, y+2)) lst.push([x-1, y+2]);
+          if (canMove(x+1, y+2)) lst.push([x+1, y+2]);
+          if (canMove(x+2, y+1)) lst.push([x+2, y+1]);
+          if (canMove(x+2, y-1)) lst.push([x+2, y-1]);
+          if (canMove(x+1, y-2)) lst.push([x+1, y-2]);
+          if (canMove(x-1, y-2)) lst.push([x-1, y-2]);
+          if (canMove(x-2, y-1)) lst.push([x-2, y-1]);
+          if (canMove(x-2, y+1)) lst.push([x-2, y+1]);
           setDestinationSquares(lst);
           break;
         // Rook moves
         case `r${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
-            if (canMove(x, y, x, y+i)) lst.push([x, y+i]);
+            if (canMove(x, y+i)) lst.push([x, y+i]);
             if (board[x][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 1); i++) {
-            if (canMove(x, y, x+i, y)) lst.push([x+i, y]);
+            if (canMove(x+i, y)) lst.push([x+i, y]);
             if (board[x+i][y]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 2); i++) {
-            if (canMove(x, y, x, y-i)) lst.push([x, y-i]);
+            if (canMove(x, y-i)) lst.push([x, y-i]);
             if (board[x][y-i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 3); i++) {
-            if (canMove(x, y, x-i, y)) lst.push([x-i, y]);
+            if (canMove(x-i, y)) lst.push([x-i, y]);
             if (board[x-i][y]) break;
           }
           setDestinationSquares(lst);
@@ -454,55 +454,55 @@ export default function ChessBoard() {
         // Queen moves
         case `q${color}`:
           for (let i = 1; i <= spacesLen(x, y, 0); i++) {
-            if (canMove(x, y, x, y+i)) lst.push([x, y+i]);
+            if (canMove(x, y+i)) lst.push([x, y+i]);
             if (board[x][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 1); i++) {
-            if (canMove(x, y, x+i, y)) lst.push([x+i, y]);
+            if (canMove(x+i, y)) lst.push([x+i, y]);
             if (board[x+i][y]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 2); i++) {
-            if (canMove(x, y, x, y-i)) lst.push([x, y-i]);
+            if (canMove(x, y-i)) lst.push([x, y-i]);
             if (board[x][y-i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 3); i++) {
-            if (canMove(x, y, x-i, y)) lst.push([x-i, y]);
+            if (canMove(x-i, y)) lst.push([x-i, y]);
             if (board[x-i][y]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 4); i++) {
-            if (canMove(x, y, x-i, y+i)) lst.push([x-i, y+i]); 
+            if (canMove(x-i, y+i)) lst.push([x-i, y+i]); 
             if (board[x-i][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 5); i++) {
-            if (canMove(x, y, x+i, y+i)) lst.push([x+i, y+i]);
+            if (canMove(x+i, y+i)) lst.push([x+i, y+i]);
             if (board[x+i][y+i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 6); i++) {
-            if (canMove(x, y, x+i, y-i)) lst.push([x+i, y-i]);
+            if (canMove(x+i, y-i)) lst.push([x+i, y-i]);
             if (board[x+i][y-i]) break;
           }
           for (let i = 1; i <= spacesLen(x, y, 7); i++) {
-            if (canMove(x, y, x-i, y-i)) lst.push([x-i, y-i]);
+            if (canMove(x-i, y-i)) lst.push([x-i, y-i]);
             if (board[x-i][y-i]) break;
           }
           setDestinationSquares(lst);
           break;
         // King moves
         case `k${color}`:
-          if (canMove(x, y, x, y+1)) lst.push([x, y+1]);
-          if (canMove(x, y, x+1, y)) lst.push([x+1, y]);
-          if (canMove(x, y, x, y-1)) lst.push([x, y-1]);
-          if (canMove(x, y, x-1, y)) lst.push([x-1, y]);
-          if (canMove(x, y, x-1, y+1)) lst.push([x-1, y+1]);
-          if (canMove(x, y, x+1, y+1)) lst.push([x+1, y+1]);
-          if (canMove(x, y, x+1, y-1)) lst.push([x+1, y-1]);
-          if (canMove(x, y, x-1, y-1)) lst.push([x-1, y-1]);
+          if (canMove(x, y+1)) lst.push([x, y+1]);
+          if (canMove(x+1, y)) lst.push([x+1, y]);
+          if (canMove(x, y-1)) lst.push([x, y-1]);
+          if (canMove(x-1, y)) lst.push([x-1, y]);
+          if (canMove(x-1, y+1)) lst.push([x-1, y+1]);
+          if (canMove(x+1, y+1)) lst.push([x+1, y+1]);
+          if (canMove(x+1, y-1)) lst.push([x+1, y-1]);
+          if (canMove(x-1, y-1)) lst.push([x-1, y-1]);
           if (turn === 1) {
-            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') lst.push([x-2,y]);
-            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !board[5][7] && !board[6][7] && board[7][7]=== 'rb') lst.push([x+2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && canMove(x-1, y) && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') lst.push([x-2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && canMove(x+1, y) && !board[5][7] && !board[6][7] && board[7][7]=== 'rb') lst.push([x+2,y]);
           } else {
-            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') lst.push([x-2,y]);
-            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !board[5][0] && !board[6][0] && board[7][0] === 'rw') lst.push([x+2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && canMove(x-1, y) && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') lst.push([x-2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && canMove(x+1, y) && !board[5][0] && !board[6][0] && board[7][0] === 'rw') lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
           break;
