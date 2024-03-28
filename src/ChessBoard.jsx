@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { IconButton, Stack, Typography } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
@@ -28,23 +28,11 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function SideBar({ pointsWhite, pointsBlack }) {
-  function Timer({ turn }) {
-    const [seconds, setSeconds] = React.useState(600);
-    React.useEffect(() => {
-      const interval = setInterval(() => {setSeconds(prevSeconds => prevSeconds - 1)}, 1000);
-      return () => clearInterval(interval);
-    }, []);
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return (
-      <Box>
-        <Typography color="white" fontSize={30}>
-          {minutes < 10 ? `0${minutes}` : minutes}:{remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}
-        </Typography>
-      </Box>
-    );
-  }
+function Timer({ turn }) {
+
+}
+
+function SideBar({ turn, pointsWhite, pointsBlack }) {
   return (
     <Stack bgcolor="#4B4847" justifyContent="space-between" paddingX={1}>
       <Stack>
@@ -115,8 +103,8 @@ function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSqua
     default:
       src = null;
   }
-  if (shaded) bgcolor = "#B58863";
-  else bgcolor = "#F0D9B5";
+  if (shaded) bgcolor = "#b58863";
+  else bgcolor = "#f0d9B5";
   if (highlighted) bgcolor = "#ffff99";
   if (selected) bgcolor = "#ffff77";
   return (
@@ -125,30 +113,36 @@ function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSqua
         width={64}
         height={64}
         bgcolor={bgcolor}
-        justifyContent="space-between"
+        justifyContent="center"
+        position="relative"
         padding={0.2}
       >
         <Typography fontWeight="bold"
           sx={{
+            position: "absolute",
+            top: 0, left: 3,
             userSelect: "none"
           }}
         >
           {x === 0 ? y + 1 : null}
         </Typography>
         { src && 
-          <Box
+          <Stack
             sx={{
-              position: "absolute",
+              mr: 0.5,
+              justifyContent: "center", alignItems: "center",
               userSelect: "none"
             }}
           >
             <img src={src} alt="Chess piece" />
-          </Box>
+          </Stack>
         }
         {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} />}
-        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center"}} />}
-        <Typography fontWeight="bold" alignSelf="end"
+        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center",  position: "absolute"}} />}
+        <Typography fontWeight="bold"
           sx={{
+            position: "absolute",
+            bottom: 0, right: 2,
             userSelect: "none"
           }}
         >
@@ -602,7 +596,7 @@ export default function ChessBoard() {
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} rightClickSquare={rightClickSquare} />)}
       </Stack>
-      <SideBar pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
+      <SideBar turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
     </Stack>
   )
 }
