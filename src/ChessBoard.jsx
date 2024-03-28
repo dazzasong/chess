@@ -1,4 +1,4 @@
-import { IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
@@ -28,8 +28,30 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer({ turn }) {
+function Timer({ turn, timerFor }) {
+  const [seconds, setSeconds] = React.useState(600);
+  React.useEffect(() => {
+    if (turn === timerFor) {
+      const intervalId = setInterval(() => {
+        setSeconds(prevSeconds => prevSeconds - 1);
+      }, 1000);
+      return () => clearInterval(intervalId);
+    }
+  }, [turn, timerFor]);
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  if (seconds === 10) tenSecondsSoundEffect.play();
 
+  return (
+    <Box>
+      <Typography color="white" fontSize={20}>
+        {formatTime(seconds)}
+      </Typography>
+    </Box>
+  )
 }
 
 function SideBar({ turn, pointsWhite, pointsBlack }) {
@@ -43,10 +65,10 @@ function SideBar({ turn, pointsWhite, pointsBlack }) {
         >
           {pointsBlack} pts
         </Typography>
-        <Timer turn={1} />
+        <Timer turn={turn} timerFor={1} />
       </Stack>
       <Stack>
-        <Timer turn={-1} />
+        <Timer turn={turn} timerFor={-1} />
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
@@ -107,6 +129,7 @@ function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSqua
   else bgcolor = "#f0d9B5";
   if (highlighted) bgcolor = "#ffff99";
   if (selected) bgcolor = "#ffff77";
+
   return (
     <div onClick={() => clickSquare(x, y, selected, destinated)} onContextMenu={() => rightClickSquare(x, y)}>
       <Stack
@@ -262,6 +285,7 @@ export default function ChessBoard() {
         default: throw new Error("Invalid piece!");
       }
     }
+
     return (
       <Stack
         border={"solid"}
@@ -590,6 +614,7 @@ export default function ChessBoard() {
     for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]);
     for (let coordinate in highlightedSquares) if (highlightedSquares[coordinate][0] === x) highlightColumns[x].push(highlightedSquares[coordinate][1]);
   }
+
   return (
     <Stack direction="row">
       {promotingSquare && <PromotionCard />}
