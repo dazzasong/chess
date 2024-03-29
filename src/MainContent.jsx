@@ -1,12 +1,17 @@
 import { Box, Button, IconButton, Stack, darken } from "@mui/material";
+import { green, orange, red } from "@mui/material/colors";
 import SettingsIcon from '@mui/icons-material/Settings';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import React from 'react';
-import { green, orange, red } from "@mui/material/colors";
-import ChessBoard from "./ChessBoard";
 import background from "./assets/images/backgrounds/background.jpg";
+import gameStartAudio from "./assets/sounds/game-start.mp3";
+import gameEndAudio from "./assets/sounds/game-end.mp3";
+import ChessBoard from "./ChessBoard";
+
+const gameStartSoundEffect = new Audio(gameStartAudio);
+const gameEndSoundEffect = new Audio(gameEndAudio);
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame
@@ -30,10 +35,13 @@ export default function MainContent() {
   function clickGameButton() {
     if (mode === 0) {
       setMode(1);
+      gameStartSoundEffect.play();
     } else if (mode === 1) {
       setMode(2);
+      gameEndSoundEffect.play();
     } else {
       setMode(1);
+      gameStartSoundEffect.play();
     }
   }
 
@@ -65,7 +73,7 @@ export default function MainContent() {
         >
           {buttonText}
         </Button>
-        <ChessBoard />
+        <ChessBoard mode={mode} />
       </Stack>
       <IconButton>
         <SettingsIcon />

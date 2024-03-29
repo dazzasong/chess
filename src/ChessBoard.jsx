@@ -28,16 +28,17 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer({ turn, timerFor }) {
+function Timer({ turn, timerFor, mode }) {
   const [seconds, setSeconds] = React.useState(600);
+  let color = seconds <= 10 ? "red" : "white";
   React.useEffect(() => {
-    if (turn === timerFor) {
+    if (turn === timerFor && mode === 1) {
       const intervalId = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds - 1);
       }, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [turn, timerFor]);
+  }, [turn, timerFor, mode]);
   function formatTime(time) {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -46,15 +47,15 @@ function Timer({ turn, timerFor }) {
   if (seconds === 10) tenSecondsSoundEffect.play();
 
   return (
-    <Box>
-      <Typography color="white" fontSize={20}>
+    <Box border="solid" borderColor={color} borderRadius={1} padding={1}>
+      <Typography color={color} fontSize={20} fontWeight="bold">
         {formatTime(seconds)}
       </Typography>
     </Box>
   )
 }
 
-function SideBar({ turn, pointsWhite, pointsBlack }) {
+function SideBar({ mode, turn, pointsWhite, pointsBlack }) {
   return (
     <Stack bgcolor="#4B4847" justifyContent="space-between" paddingX={1}>
       <Stack>
@@ -65,10 +66,10 @@ function SideBar({ turn, pointsWhite, pointsBlack }) {
         >
           {pointsBlack} pts
         </Typography>
-        <Timer turn={turn} timerFor={1} />
+        <Timer turn={turn} timerFor={1} mode={mode} />
       </Stack>
       <Stack>
-        <Timer turn={turn} timerFor={-1} />
+        <Timer turn={turn} timerFor={-1} mode={mode} />
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
@@ -81,7 +82,7 @@ function SideBar({ turn, pointsWhite, pointsBlack }) {
   )
 }
 
-function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSquare, rightClickSquare }) {
+function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
   let src;
   let bgcolor;
@@ -127,11 +128,10 @@ function ChessSquare({ x, y, piece, selected, destinated, highlighted, clickSqua
   }
   if (shaded) bgcolor = "#b58863";
   else bgcolor = "#f0d9B5";
-  if (highlighted) bgcolor = "#ffff99";
   if (selected) bgcolor = "#ffff77";
 
   return (
-    <div onClick={() => clickSquare(x, y, selected, destinated)} onContextMenu={() => rightClickSquare(x, y)}>
+    <div onClick={() => clickSquare(x, y, selected, destinated)}>
       <Stack
         width={64}
         height={64}
@@ -184,7 +184,7 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
   )
 }
 
-export default function ChessBoard() {
+export default function ChessBoard({ mode }) {
   const initialBoard = [
     ['rw', 'pw', null, null, null, null, 'pb', 'rb'],
     ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
@@ -196,18 +196,21 @@ export default function ChessBoard() {
     ['rw', 'pw', null, null, null, null, 'pb', 'rb']
   ];
   const [board, setBoard] = React.useState(initialBoard);
-  const [turn, setTurn] = React.useState(-1); // -1: White's turn || 1: Black's turn || 0: terminated
+  const [turn, setTurn] = React.useState(-1); // -1: White's turn || 1: Black's turn
   const [pointsWhite, setPointsWhite] = React.useState(0);
   const [pointsBlack, setPointsBlack] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
-  const [highlightedSquares, setHighlightedSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const [promotingSquare, setPromotingSquare] = React.useState(null);
   const [enPassantSquare, setEnpassantSquare] = React.useState(null);
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
+  React.useEffect(() => {
+    if (mode === 1) setBoard(initialBoard);
+    // eslint-disable-next-line
+  }, [mode]);
   function addPoint(pieceTaken, opposite = false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
@@ -407,7 +410,7 @@ export default function ChessBoard() {
     }
     return false;
   }
-    if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare) { // If the clicked square has a piece and is their current turn...
+    if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare && mode === 1) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
       let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
       switch (board[x][y]) {
@@ -602,26 +605,16 @@ export default function ChessBoard() {
       setDestinationSquares(null);
     }
   }
-  function rightClickSquare(x, y) { // function when a square is right-clicked
-    setHighlightedSquares()
-    
-  }
-  // Distinated and highlighted squares for each column - index is column number
-  let destinationColumns = [[],[],[],[],[],[],[],[]];
-  let highlightColumns = [[],[],[],[],[],[],[],[]];
-  // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
-  for (let x = 0; x < 8; x++) {
-    for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]);
-    for (let coordinate in highlightedSquares) if (highlightedSquares[coordinate][0] === x) highlightColumns[x].push(highlightedSquares[coordinate][1]);
-  }
+  let destinationColumns = [[],[],[],[],[],[],[],[]]; // Destination squares for each column - index is column number
+  for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
     <Stack direction="row">
       {promotingSquare && <PromotionCard />}
       <Stack direction="row" boxShadow={10}>
-        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} rightClickSquare={rightClickSquare} />)}
+        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
-      <SideBar turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
+      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
     </Stack>
   )
 }
