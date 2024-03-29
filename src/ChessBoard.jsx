@@ -31,15 +31,16 @@ const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 function Timer({ turn, timerFor, mode }) {
   const [seconds, setSeconds] = React.useState(600);
   let color = seconds <= 10 ? "red" : "white";
-  React.useEffect(() => {
+  React.useEffect(() => { // useEffect for timer
     if (turn === timerFor && mode === 1) {
-      const intervalId = setInterval(() => {
+      const chessTimer = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds - 1);
       }, 1000);
-      return () => clearInterval(intervalId);
+      return () => clearInterval(chessTimer);
     }
   }, [turn, timerFor, mode]);
-  function formatTime(time) {
+  React.useEffect(() => {if (mode === 1) setSeconds(600)}, [mode]); // Resets timer on new game
+  function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
