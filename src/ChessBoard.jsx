@@ -208,8 +208,15 @@ export default function ChessBoard({ mode }) {
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
   React.useEffect(() => {
-    if (mode === 1) setBoard(initialBoard);
-    // eslint-disable-next-line
+    if (mode === 1) { // if a new game starts
+      setBoard(initialBoard);
+      setTurn(-1);
+    }
+    else if (mode === 2) { // if the game ends
+      setSelectedSquare(null);
+      setDestinationSquares(null);  
+    }
+  // eslint-disable-next-line
   }, [mode]);
   function addPoint(pieceTaken, opposite = false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
