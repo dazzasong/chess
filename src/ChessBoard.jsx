@@ -212,6 +212,10 @@ export default function ChessBoard({ mode }) {
     if (mode === 1) { // if a new game starts
       setBoard(initialBoard);
       setTurn(-1);
+      setPointsWhite(0);
+      setPointsBlack(0);
+      setCastleStateWhite(0);
+      setCastleStateBlack(0);
     }
     else if (mode === 2) { // if the game ends
       setSelectedSquare(null);
