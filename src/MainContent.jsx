@@ -1,11 +1,9 @@
-import { Box, Button, IconButton, Stack, darken } from "@mui/material";
+import { Box, Button, Stack, darken } from "@mui/material";
 import { green, orange, red } from "@mui/material/colors";
-import SettingsIcon from '@mui/icons-material/Settings';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import React from 'react';
-import background from "./assets/images/backgrounds/background.jpg";
 import gameStartAudio from "./assets/sounds/game-start.mp3";
 import gameEndAudio from "./assets/sounds/game-end.mp3";
 import ChessBoard from "./ChessBoard";
@@ -46,13 +44,7 @@ export default function MainContent() {
   }
 
   return (
-    <Box
-      sx={{
-        backgroundImage: `url(${background})`,
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover"
-      }}
-    >
+    <Box>
       <Stack direction="row" justifyContent="space-between" margin="0 20px">
         <Button disableRipple disableElevation
           onClick={clickGameButton}
@@ -75,9 +67,6 @@ export default function MainContent() {
         </Button>
         <ChessBoard mode={mode} />
       </Stack>
-      <IconButton>
-        <SettingsIcon />
-      </IconButton>
     </Box>
   )
 }

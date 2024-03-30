@@ -1,4 +1,4 @@
-import { Link, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import React from "react";
 
 export default function Header() {
@@ -18,13 +18,6 @@ export default function Header() {
       >
         Chess
       </Typography>
-      <Link href="#" underline="none" color="inherit" mr={2}
-        sx={{
-          userSelect: "none"
-        }}
-      >
-        How to play
-      </Link>
     </Stack>
   )
 }
