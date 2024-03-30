@@ -28,17 +28,18 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer({ turn, timerFor, mode }) {
+function Timer({ turn, timerFor, mode, promotingSquare }) {
   const [seconds, setSeconds] = React.useState(600);
   let color = seconds <= 10 ? "red" : "white";
   React.useEffect(() => { // useEffect for timer
-    if (turn === timerFor && mode === 1) {
+    if ((promotingSquare ? turn !== timerFor : turn === timerFor) && mode === 1) {
       const chessTimer = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds - 1);
       }, 1000);
       return () => clearInterval(chessTimer);
     }
-  }, [turn, timerFor, mode]);
+  // eslint-disable-next-line
+  }, [turn, mode, promotingSquare]);
   React.useEffect(() => {if (mode === 1) setSeconds(600)}, [mode]); // Resets timer on new game
   function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
@@ -56,7 +57,7 @@ function Timer({ turn, timerFor, mode }) {
   )
 }
 
-function SideBar({ mode, turn, pointsWhite, pointsBlack }) {
+function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare }) {
   return (
     <Stack bgcolor="#4B4847" justifyContent="space-between" padding={2}>
       <Stack>
@@ -67,10 +68,10 @@ function SideBar({ mode, turn, pointsWhite, pointsBlack }) {
         >
           {pointsBlack > pointsWhite ? `+${pointsBlack - pointsWhite}` : null}
         </Typography>
-        <Timer turn={turn} timerFor={1} mode={mode} />
+        <Timer turn={turn} timerFor={1} mode={mode} promotingSquare={promotingSquare} />
       </Stack>
       <Stack>
-        <Timer turn={turn} timerFor={-1} mode={mode} />
+        <Timer turn={turn} timerFor={-1} mode={mode} promotingSquare={promotingSquare} />
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
@@ -219,7 +220,8 @@ export default function ChessBoard({ mode }) {
     }
     else if (mode === 2) { // if the game ends
       setSelectedSquare(null);
-      setDestinationSquares(null);  
+      setDestinationSquares(null);
+      setPromotingSquare(null);
     }
   // eslint-disable-next-line
   }, [mode]);
@@ -626,7 +628,7 @@ export default function ChessBoard({ mode }) {
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
-      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} />
+      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
     </Stack>
   )
 }
