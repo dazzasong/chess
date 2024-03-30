@@ -28,7 +28,7 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer({ turn, timerFor, mode, promotingSquare }) {
+function Timer({ turn, timerFor, mode, promotingSquare, setMode }) {
   const [seconds, setSeconds] = React.useState(600);
   let color = seconds <= 10 ? "red" : "white";
   React.useEffect(() => { // useEffect for timer
@@ -47,6 +47,7 @@ function Timer({ turn, timerFor, mode, promotingSquare }) {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   if (seconds === 10) tenSecondsSoundEffect.play();
+  else if (seconds === 0) setMode(2);
 
   return (
     <Box border="solid" borderColor={color} borderRadius={1} padding={1}>
@@ -57,7 +58,7 @@ function Timer({ turn, timerFor, mode, promotingSquare }) {
   )
 }
 
-function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare }) {
+function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare, setMode }) {
   return (
     <Stack bgcolor="#4B4847" justifyContent="space-between" padding={2}>
       <Stack>
@@ -68,10 +69,10 @@ function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare }) {
         >
           {pointsBlack > pointsWhite ? `+${pointsBlack - pointsWhite}` : null}
         </Typography>
-        <Timer turn={turn} timerFor={1} mode={mode} promotingSquare={promotingSquare} />
+        <Timer turn={turn} timerFor={1} mode={mode} promotingSquare={promotingSquare} setMode={setMode} />
       </Stack>
       <Stack>
-        <Timer turn={turn} timerFor={-1} mode={mode} promotingSquare={promotingSquare} />
+        <Timer turn={turn} timerFor={-1} mode={mode} promotingSquare={promotingSquare} setMode={setMode} />
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
@@ -186,7 +187,7 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
   )
 }
 
-export default function ChessBoard({ mode }) {
+export default function ChessBoard({ mode, setMode }) {
   const initialBoard = [
     ['rw', 'pw', null, null, null, null, 'pb', 'rb'],
     ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
@@ -628,7 +629,7 @@ export default function ChessBoard({ mode }) {
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
-      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
+      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} setMode={setMode} />
     </Stack>
   )
 }

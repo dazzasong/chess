@@ -31,21 +31,18 @@ export default function MainContent() {
     endButtonIcon = <RefreshIcon />;
   }
   function clickGameButton() {
-    if (mode === 0) {
-      setMode(1);
-      gameStartSoundEffect.play();
-    } else if (mode === 1) {
-      setMode(2);
-      gameEndSoundEffect.play();
-    } else {
-      setMode(1);
-      gameStartSoundEffect.play();
-    }
+    if (mode === 0) setMode(1);
+    else if (mode === 1) setMode(2);
+    else setMode(1);
   }
+  React.useEffect(() => {
+    if (mode === 1) gameStartSoundEffect.play();
+    else if (mode === 2) gameEndSoundEffect.play();
+  }, [mode])
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" margin="0 20px">
+      <Stack direction="row" justifyContent="space-between" mx={5}>
         <Button disableRipple disableElevation
           onClick={clickGameButton}
           variant="contained"
@@ -65,7 +62,10 @@ export default function MainContent() {
         >
           {buttonText}
         </Button>
-        <ChessBoard mode={mode} />
+        <Stack>
+          HOW MANY WON WHO WON EYYY
+        </Stack>
+        <ChessBoard mode={mode} setMode={setMode} />
       </Stack>
     </Box>
   )
