@@ -58,14 +58,14 @@ function Timer({ turn, timerFor, mode }) {
 
 function SideBar({ mode, turn, pointsWhite, pointsBlack }) {
   return (
-    <Stack bgcolor="#4B4847" justifyContent="space-between" paddingX={1}>
+    <Stack bgcolor="#4B4847" justifyContent="space-between" padding={2}>
       <Stack>
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
           }}
         >
-          {pointsBlack} pts
+          {pointsBlack > pointsWhite ? `+${pointsBlack - pointsWhite}` : null}
         </Typography>
         <Timer turn={turn} timerFor={1} mode={mode} />
       </Stack>
@@ -76,7 +76,7 @@ function SideBar({ mode, turn, pointsWhite, pointsBlack }) {
             userSelect: "none"
           }}
         >
-          {pointsWhite} pts
+          {pointsWhite > pointsBlack ? `+${pointsWhite - pointsBlack}` : null}
         </Typography>
       </Stack>
     </Stack>
