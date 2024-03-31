@@ -1,4 +1,4 @@
-import { Box, Button, Stack, darken } from "@mui/material";
+import { Button, Stack, darken } from "@mui/material";
 import { green, orange, red } from "@mui/material/colors";
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -41,32 +41,30 @@ export default function MainContent() {
   }, [mode])
 
   return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" mx={5}>
-        <Button disableRipple disableElevation
-          onClick={clickGameButton}
-          variant="contained"
-          startIcon={startButtonIcon}
-          endIcon={endButtonIcon}
-          sx={{
-            width: 220,
-            height: 75,
-            fontSize: 20,
-            fontWeight: "bold",
-            backgroundColor: buttonColor,
-            textTransform: "none",
-            ":hover": {
-              backgroundColor: darken(buttonColor, 0.1)
-            }
-          }}
-        >
-          {buttonText}
-        </Button>
-        <Stack>
-          HOW MANY WON WHO WON EYYY
-        </Stack>
+    <Stack direction="row" justifyContent="space-between" mx={5}>
+      <Button disableRipple disableElevation
+        onClick={clickGameButton}
+        variant="contained"
+        startIcon={startButtonIcon}
+        endIcon={endButtonIcon}
+        sx={{
+          width: 220,
+          height: 75,
+          fontSize: 20,
+          fontWeight: "bold",
+          backgroundColor: buttonColor,
+          textTransform: "none",
+          ":hover": {
+            backgroundColor: darken(buttonColor, 0.1)
+          }
+        }}
+      >
+        {buttonText}
+      </Button>
+      <Stack>
+        HOW MANY WON WHO WON EYYY
         <ChessBoard mode={mode} setMode={setMode} />
       </Stack>
-    </Box>
+    </Stack>
   )
 }
