@@ -1,4 +1,4 @@
-import { Button, Stack, darken } from "@mui/material";
+import { Button, Stack, Typography, darken } from "@mui/material";
 import { green, orange, red } from "@mui/material/colors";
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -62,7 +62,14 @@ export default function MainContent() {
         {buttonText}
       </Button>
       <Stack>
-        HOW MANY WON WHO WON EYYY
+        <Stack direction="row" justifyContent="space-around" bgcolor="grey">
+          <Typography color="white">
+            DISPLAY WHO WON HERE
+          </Typography>
+          <Typography color="white">
+            DISPLAY WHO WON HERE
+          </Typography>
+        </Stack>
         <ChessBoard mode={mode} setMode={setMode} />
       </Stack>
     </Stack>

@@ -352,8 +352,7 @@ export default function ChessBoard({ mode, setMode }) {
     return !kingInCheck(tempBoard);
   }
   // In the current board state, can the piece, at position (x,y) make any of its potential moves, without leaving the king in check
-  function pieceCanMove(board, piece, x, y) {
-
+  function pieceCanMove(x, y, board) {
   }
   function checkmated(board, color) {
     for (let i = 0; i < 8; i++) {
@@ -363,7 +362,7 @@ export default function ChessBoard({ mode, setMode }) {
         if (!piece || piece[1] !== color) continue
         // Otherwise, this is one of our pieces, we want to see if it can move to any of its potential moves without leaving the king in check
         // As soon as we find one move that leaves the king NOT IN CHECK, we can return false (not checkmated)
-        if (pieceCanMove(board, piece, i, j)) return false
+        if (pieceCanMove(i, j, board)) return false
       }
     }
     
@@ -558,11 +557,11 @@ export default function ChessBoard({ mode, setMode }) {
           if (canMove(x+1, y-1)) lst.push([x+1, y-1]);
           if (canMove(x-1, y-1)) lst.push([x-1, y-1]);
           if (turn === 1) {
-            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && canMove(x-1, y) && canMove(x-2, y) && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') lst.push([x-2,y]);
-            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && canMove(x+1, y) && canMove(x+2, y) && !board[5][7] && !board[6][7] && board[7][7]=== 'rb') lst.push([x+2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') lst.push([x-2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][7] && !board[6][7] && board[7][7]=== 'rb') lst.push([x+2,y]);
           } else {
-            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && canMove(x-1, y) && canMove(x-2, y) && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') lst.push([x-2,y]);
-            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && canMove(x+1, y) && canMove(x+2, y) && !board[5][0] && !board[6][0] && board[7][0] === 'rw') lst.push([x+2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') lst.push([x-2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][0] && !board[6][0] && board[7][0] === 'rw') lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
           break;
