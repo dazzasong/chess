@@ -351,6 +351,24 @@ export default function ChessBoard({ mode, setMode }) {
     tempBoard[x][y] = null;
     return !kingInCheck(tempBoard);
   }
+  // In the current board state, can the piece, at position (x,y) make any of its potential moves, without leaving the king in check
+  function pieceCanMove(board, piece, x, y) {
+
+  }
+  function checkmated(board, color) {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        const piece = board[i][j]
+        // If there is no piece, or if this piece is the opposing color, ignore and CONTINUE the loops
+        if (!piece || piece[1] !== color) continue
+        // Otherwise, this is one of our pieces, we want to see if it can move to any of its potential moves without leaving the king in check
+        // As soon as we find one move that leaves the king NOT IN CHECK, we can return false (not checkmated)
+        if (pieceCanMove(board, piece, i, j)) return false
+      }
+    }
+    
+    return true // If we exit the loop, that means we did not RETURN FALSE, which means we did not find a single move we can make without leaving the king in check, so we have been checkmated.
+  }
   function kingInCheck(board, opposing = false) {
     let kingX, kingY;
     for (let i = 0; i < 8; i++) {
@@ -592,15 +610,17 @@ export default function ChessBoard({ mode, setMode }) {
           castle = true;
         }
       }
-      // Checks for promotion
-      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]);
-      // Checks for en passant
-      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) {
+      else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]); // Checks for promotion
+      else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
         updatedBoard[enPassantSquare[0]][enPassantSquare[1]] = null;
         addPoint('p');
         captureSoundEffect.play();
-      } else if (kingInCheck(updatedBoard, true)) checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
-      else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
+      } else if (kingInCheck(updatedBoard, true)) {
+        const win = checkmated(updatedBoard, opposingColor)
+        checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
+        console.log("check: " + color)
+        if (win) console.log("checkmate: " + color + " wins!")
+      } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
       else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
       if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
         addPoint(board[x][y]);
