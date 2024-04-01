@@ -13,6 +13,7 @@ const gameEndSoundEffect = new Audio(gameEndAudio);
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame
+  const [winAnnouncement, setWinAnnouncement] = React.useState(null);
   const [whiteWins, setWhiteWins] = React.useState(0);
   const [blackWins, setBlackWins] = React.useState(0);
   let buttonText;
@@ -38,9 +39,20 @@ export default function MainContent() {
     else setMode(1);
   }
   React.useEffect(() => {
-    if (mode === 1) gameStartSoundEffect.play();
+    if (mode === 1) {
+      gameStartSoundEffect.play();
+      setWinAnnouncement(null);
+    }
     else if (mode === 2) gameEndSoundEffect.play();
-  }, [mode])
+  }, [mode]);
+  React.useEffect(() => {
+    if (mode === 2) setWinAnnouncement("White wins!");
+  // eslint-disable-next-line
+  }, [whiteWins]);
+  React.useEffect(() => {
+    if (mode === 2) setWinAnnouncement("Black wins!");
+  // eslint-disable-next-line
+  }, [blackWins]);
 
   return (
     <Stack direction="row" justifyContent="space-between" mx={5}>
@@ -65,12 +77,21 @@ export default function MainContent() {
       </Button>
       <Stack>
         <Stack direction="row" justifyContent="space-around" bgcolor="grey">
-          <Typography color="white" fontSize={20} fontWeight="bold">
-            White: {whiteWins}
-          </Typography>
-          <Typography color="white" fontSize={20} fontWeight="bold">
-            Black: {blackWins}
-          </Typography>
+          { !winAnnouncement &&
+            <Typography color="white" fontSize={20} fontWeight="bold">
+              White: {whiteWins}
+            </Typography>
+          }
+          { winAnnouncement &&
+            <Typography color="white" fontSize={20} fontWeight="bold">
+              {winAnnouncement}
+            </Typography>
+          }
+          { !winAnnouncement &&
+            <Typography color="white" fontSize={20} fontWeight="bold">
+              Black: {blackWins}
+            </Typography>
+          }
         </Stack>
         <ChessBoard mode={mode} setMode={setMode} whiteWins={whiteWins} blackWins={blackWins} setWhiteWins={setWhiteWins} setBlackWins={setBlackWins} />
       </Stack>
