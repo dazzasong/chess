@@ -187,7 +187,7 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
   )
 }
 
-export default function ChessBoard({ mode, setMode }) {
+export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhiteWins, setBlackWins }) {
   const initialBoard = [
     ['rw', 'pw', null, null, null, null, 'pb', 'rb'],
     ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
@@ -226,7 +226,7 @@ export default function ChessBoard({ mode, setMode }) {
     }
   // eslint-disable-next-line
   }, [mode]);
-  function addPoint(pieceTaken, opposite = false, customPoint) {
+  function addPoint(pieceTaken, opposite=false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
       case 'p': // If pawn is taken...
@@ -339,109 +339,213 @@ export default function ChessBoard({ mode, setMode }) {
     )
   }
   function clickSquare(x, y, selected, destinated) { // function when a square is clicked
-  // Checks if move is within bounds
-  const withinBounds = (x, y) => x >= 0 && x <= 7 && y >= 0 && y <= 7
-  // Fundamentally canMove but does not consider king in check conditions
-  const canPotentialMove = (toX, toY) => withinBounds(toX, toY) && board[toX][toY]?.[1] !== color;
-  function canMove(toX, toY) {
-    if (!canPotentialMove(toX, toY)) return false;
-    // Now check if king is in check
-    let tempBoard = board.map(row => [...row]);
-    tempBoard[toX][toY] = tempBoard[x][y];
-    tempBoard[x][y] = null;
-    return !kingInCheck(tempBoard);
-  }
-  // In the current board state, can the piece, at position (x,y) make any of its potential moves, without leaving the king in check
-  function pieceCanMove(x, y, board) {
-  }
-  function checkmated(board, color) {
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        const piece = board[i][j]
-        // If there is no piece, or if this piece is the opposing color, ignore and CONTINUE the loops
-        if (!piece || piece[1] !== color) continue
-        // Otherwise, this is one of our pieces, we want to see if it can move to any of its potential moves without leaving the king in check
-        // As soon as we find one move that leaves the king NOT IN CHECK, we can return false (not checkmated)
-        if (pieceCanMove(i, j, board)) return false
-      }
+    // Checks if move is within bounds
+    const withinBounds = (x, y) => x >= 0 && x <= 7 && y >= 0 && y <= 7;
+    // Fundamentally canMove but does not consider king in check conditions
+    function canPotentialMove(toX, toY, board, opposing=false) {
+      const c = opposing ? opposingColor : color
+      return withinBounds(toX, toY) && board[toX][toY]?.[1] !== c;
     }
-    
-    return true // If we exit the loop, that means we did not RETURN FALSE, which means we did not find a single move we can make without leaving the king in check, so we have been checkmated.
-  }
-  function kingInCheck(board, opposing = false) {
-    let kingX, kingY;
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
-        if (board[i][j] === `k${opposing ? opposingColor : color}`) {
-          kingX = i;
-          kingY = j;
+    function canMove(toX, toY, curBoard=board, opposing=false, fromX=x, fromY=y) {
+      if (!canPotentialMove(toX, toY, curBoard, opposing)) return false;
+      // Now check if king is in check
+      let tempBoard = curBoard.map(row => [...row]);
+      tempBoard[toX][toY] = tempBoard[fromX][fromY];
+      tempBoard[fromX][fromY] = null;
+      return !kingInCheck(tempBoard, opposing);
+    }
+    function kingInCheck(board, opposing=false) {
+      let kingX, kingY;
+      for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+          if (board[i][j] === `k${opposing ? opposingColor : color}`) {
+            kingX = i;
+            kingY = j;
+          }
         }
       }
+      const usedColor = opposing ? color : opposingColor;
+      // We want to test if any opposing pieces are able to capture the king in the current board state.
+      const kicTurn = opposing ? -turn : turn;
+      // Pawn
+      if ((canPotentialMove(kingX-1, kingY-kicTurn, board, opposing) && board[kingX-1][kingY-kicTurn] === `p${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY-kicTurn, board, opposing) && board[kingX+1][kingY-kicTurn] === `p${usedColor}`)) return true;
+      // Knight
+      if ((canPotentialMove(kingX-1, kingY+2, board, opposing) && board[kingX-1][kingY+2] === `n${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY+2, board, opposing) && board[kingX+1][kingY+2] === `n${usedColor}`) ||
+          (canPotentialMove(kingX+2, kingY+1, board, opposing) && board[kingX+2][kingY+1] === `n${usedColor}`) ||
+          (canPotentialMove(kingX+2, kingY-1, board, opposing) && board[kingX+2][kingY-1] === `n${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY-2, board, opposing) && board[kingX+1][kingY-2] === `n${usedColor}`) ||
+          (canPotentialMove(kingX-1, kingY-2, board, opposing) && board[kingX-1][kingY-2] === `n${usedColor}`) ||
+          (canPotentialMove(kingX-2, kingY-1, board, opposing) && board[kingX-2][kingY-1] === `n${usedColor}`) ||
+          (canPotentialMove(kingX-2, kingY+1, board, opposing) && board[kingX-2][kingY+1] === `n${usedColor}`)) return true;
+      // Bishop, Rook, and Queen
+      for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
+        if (board[kingX-i][kingY+i] === `b${usedColor}` || board[kingX-i][kingY+i] === `q${usedColor}`) return true;
+        if (board[kingX-i][kingY+i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 5); i++) {
+        if (board[kingX+i][kingY+i] === `b${usedColor}` || board[kingX+i][kingY+i] === `q${usedColor}`) return true;
+        if (board[kingX+i][kingY+i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 6); i++) {
+        if (board[kingX+i][kingY-i] === `b${usedColor}` || board[kingX+i][kingY-i] === `q${usedColor}`) return true;
+        if (board[kingX+i][kingY-i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 7); i++) {
+        if (board[kingX-i][kingY-i] === `b${usedColor}` || board[kingX-i][kingY-i] === `q${usedColor}`) return true;
+        if (board[kingX-i][kingY-i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 0); i++) {
+        if (board[kingX][kingY+i] === `r${usedColor}` || board[kingX][kingY+i] === `q${usedColor}`) return true;
+        if (board[kingX][kingY+i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 1); i++) {
+        if (board[kingX+i][kingY] === `r${usedColor}` || board[kingX+i][kingY] === `q${usedColor}`) return true;
+        if (board[kingX+i][kingY]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 2); i++) {
+        if (board[kingX][kingY-i] === `r${usedColor}` || board[kingX][kingY-i] === `q${usedColor}`) return true;
+        if (board[kingX][kingY-i]) break;
+      }
+      for (let i = 1; i <= spacesLen(kingX, kingY, 3); i++) {
+        if (board[kingX-i][kingY] === `r${usedColor}` || board[kingX-i][kingY] === `q${usedColor}`) return true;
+        if (board[kingX-i][kingY]) break;
+      }
+      // King
+      if ((canPotentialMove(kingX, kingY+1, board, opposing) && board[kingX][kingY+1] === `k${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY, board, opposing) && board[kingX+1][kingY] === `k${usedColor}`) ||
+          (canPotentialMove(kingX, kingY-1, board, opposing) && board[kingX][kingY-1] === `k${usedColor}`) ||
+          (canPotentialMove(kingX-1, kingY, board, opposing) && board[kingX-1][kingY] === `k${usedColor}`) ||
+          (canPotentialMove(kingX-1, kingY+1, board, opposing) && board[kingX-1][kingY+1] === `k${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY+1, board, opposing) && board[kingX+1][kingY+1] === `k${usedColor}`) ||
+          (canPotentialMove(kingX+1, kingY-1, board, opposing) && board[kingX+1][kingY-1] === `k${usedColor}`) ||
+          (canPotentialMove(kingX-1, kingY-1, board, opposing) && board[kingX-1][kingY-1] === `k${usedColor}`)) return true;
+      return false;
     }
-    const usedColor = opposing ? color : opposingColor;
-    /* 
-    We want to test if any opposing pieces are able to capture the king in the current board state.
-    The king is in check if:
-    - It is able to move to a square (x,y), and
-    - An opposing piece is in (x,y) and is in range to capture the king
-    */
-    const kicTurn = opposing ? -turn : turn;
-    // Pawn
-    if ((canPotentialMove(kingX-1, kingY-kicTurn) && board[kingX-1][kingY-kicTurn] === `p${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY-kicTurn) && board[kingX+1][kingY-kicTurn] === `p${usedColor}`)) return true;
-    // Knight
-    if ((canPotentialMove(kingX-1, kingY+2) && board[kingX-1][kingY+2] === `n${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY+2) && board[kingX+1][kingY+2] === `n${usedColor}`) ||
-        (canPotentialMove(kingX+2, kingY+1) && board[kingX+2][kingY+1] === `n${usedColor}`) ||
-        (canPotentialMove(kingX+2, kingY-1) && board[kingX+2][kingY-1] === `n${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY-2) && board[kingX+1][kingY-2] === `n${usedColor}`) ||
-        (canPotentialMove(kingX-1, kingY-2) && board[kingX-1][kingY-2] === `n${usedColor}`) ||
-        (canPotentialMove(kingX-2, kingY-1) && board[kingX-2][kingY-1] === `n${usedColor}`) ||
-        (canPotentialMove(kingX-2, kingY+1) && board[kingX-2][kingY+1] === `n${usedColor}`)) return true;
-    // King
-    if ((canPotentialMove(kingX, kingY+1) && board[kingX][kingY+1] === `k${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY) && board[kingX+1][kingY] === `k${usedColor}`) ||
-        (canPotentialMove(kingX, kingY-1) && board[kingX][kingY-1] === `k${usedColor}`) ||
-        (canPotentialMove(kingX-1, kingY) && board[kingX-1][kingY] === `k${usedColor}`) ||
-        (canPotentialMove(kingX-1, kingY+1) && board[kingX-1][kingY+1] === `k${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY+1) && board[kingX+1][kingY+1] === `k${usedColor}`) ||
-        (canPotentialMove(kingX+1, kingY-1) && board[kingX+1][kingY-1] === `k${usedColor}`) ||
-        (canPotentialMove(kingX-1, kingY-1) && board[kingX-1][kingY-1] === `k${usedColor}`)) return true;
-    // Rook and Queen
-    for (let i = 1; i <= spacesLen(kingX, kingY, 0); i++) {
-      if (board[kingX][kingY+i] === `r${usedColor}` || board[kingX][kingY+i] === `q${usedColor}`) return true;
-      if (board[kingX][kingY+i]) break;
+    // In the current board state, can the piece, at position (x,y) make any of its potential moves, without leaving the king in check
+    function pieceCanMove(x, y, board) {
+      switch (board[x][y]) {
+        // Pawn moves
+        case `p${opposingColor}`:
+          let mod = turn;
+          let startPoint = turn === 1 ? 6 : 1;
+          if ((canMove(x, y+1*mod, board, true, x, y) && !board[x][y+1*mod]) ||
+              (canMove(x, y+2*mod, board, true, x, y) && !board[x][y+2*mod] && y === startPoint) ||
+              (withinBounds(x-1, y+1*mod) && board[x-1][y+1*mod] && canMove(x-1, y+1*mod, board, true, x, y)) ||
+              (withinBounds(x+1, y+1*mod) && board[x+1][y+1*mod] && canMove(x+1, y+1*mod, board, true, x, y)) ||
+              (canMove(x-1, y+1*mod, board, true, x, y) && x === enPassantSquare?.[0] + 1 && y === enPassantSquare[1]) ||
+              (canMove(x+1, y+1*mod, board, true, x, y) && x === enPassantSquare?.[0] - 1 && y === enPassantSquare[1])) return true;
+          return false;
+        // Bishop moves
+        case `b${opposingColor}`:
+          for (let i = 1; i <= spacesLen(x, y, 4); i++) {
+            if (canMove(x-i, y+i, board, true, x, y)) return true;
+            if (board[x-i][y+i]) break
+          }
+          for (let i = 1; i <= spacesLen(x, y, 5); i++) {
+            if (canMove(x+i, y+i, board, true, x, y)) return true;
+            if (board[x+i][y+i]) break
+          }
+          for (let i = 1; i <= spacesLen(x, y, 6); i++) {
+            if (canMove(x+i, y-i, board, true, x, y)) return true;
+            if (board[x+i][y-i]) break
+          }
+          for (let i = 1; i <= spacesLen(x, y, 7); i++) {
+            if (canMove(x-i, y-i, board, true, x, y)) return true;
+            if (board[x-i][y-i]) break
+          }
+          return false;
+        // Knight moves
+        case `n${opposingColor}`:
+          if (canMove(x-1, y+2, board, true, x, y) ||
+              canMove(x+1, y+2, board, true, x, y) ||
+              canMove(x+2, y+1, board, true, x, y) ||
+              canMove(x+2, y-1, board, true, x, y) ||
+              canMove(x+1, y-2, board, true, x, y) ||
+              canMove(x-1, y-2, board, true, x, y) ||
+              canMove(x-2, y-1, board, true, x, y) ||
+              canMove(x-2, y+1, board, true, x, y)) return true;
+          return false;
+        // Rook moves
+        case `r${opposingColor}`:
+          for (let i = 1; i <= spacesLen(x, y, 0); i++) {
+            if (canMove(x, y+i, board, true, x, y)) return true;
+            if (board[x][y+i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 1); i++) {
+            if (canMove(x+i, y, board, true, x, y)) return true;
+            if (board[x+i][y]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 2); i++) {
+            if (canMove(x, y-i, board, true, x, y)) return true;
+            if (board[x][y-i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 3); i++) {
+            if (canMove(x-i, y, board, true, x, y)) return true;
+            if (board[x-i][y]) break;
+          }
+          return false;
+        // Queen moves
+        case `q${opposingColor}`:
+          for (let i = 1; i <= spacesLen(x, y, 0); i++) {
+            if (canMove(x, y+i, board, true, x, y)) return true;
+            if (board[x][y+i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 1); i++) {
+            if (canMove(x+i, y, board, true, x, y)) return true;
+            if (board[x+i][y]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 2); i++) {
+            if (canMove(x, y-i, board, true, x, y)) return true;
+            if (board[x][y-i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 3); i++) {
+            if (canMove(x-i, y, board, true, x, y)) return true;
+            if (board[x-i][y]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 4); i++) {
+            if (canMove(x-i, y+i, board, true, x, y)) return true;
+            if (board[x-i][y+i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 5); i++) {
+            if (canMove(x+i, y+i, board, true, x, y)) return true;
+            if (board[x+i][y+i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 6); i++) {
+            if (canMove(x+i, y-i, board, true, x, y)) return true;
+            if (board[x+i][y-i]) break;
+          }
+          for (let i = 1; i <= spacesLen(x, y, 7); i++) {
+            if (canMove(x-i, y-i, board, true, x, y)) return true;
+            if (board[x-i][y-i]) break;
+          }
+          return false;
+        // King moves
+        case `k${opposingColor}`:
+          if (canMove(x, y+1, board, true, x, y) ||
+              canMove(x+1, y, board, true, x, y) ||
+              canMove(x, y-1, board, true, x, y) ||
+              canMove(x-1, y, board, true, x, y) ||
+              canMove(x-1, y+1, board, true, x, y) ||
+              canMove(x+1, y+1, board, true, x, y) ||
+              canMove(x+1, y-1, board, true, x, y) ||
+              canMove(x-1, y-1, board, true, x, y)) return true;
+          return false;
+        default:
+          throw new Error("Invalid piece!");
+      }
     }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 1); i++) {
-      if (board[kingX+i][kingY] === `r${usedColor}` || board[kingX+i][kingY] === `q${usedColor}`) return true;
-      if (board[kingX+i][kingY]) break;
+    function checkmated(board) {
+      for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+          const piece = board[i][j];
+          if (!piece || piece[1] !== opposingColor) continue;
+          if (pieceCanMove(i, j, board)) return false;
+        }
+      }
+      return true;
     }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 2); i++) {
-      if (board[kingX][kingY-i] === `r${usedColor}` || board[kingX][kingY-i] === `q${usedColor}`) return true;
-      if (board[kingX][kingY-i]) break;
-    }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 3); i++) {
-      if (board[kingX-i][kingY] === `r${usedColor}` || board[kingX-i][kingY] === `q${usedColor}`) return true;
-      if (board[kingX-i][kingY]) break;
-    }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
-      if (board[kingX-i][kingY+i] === `b${usedColor}` || board[kingX-i][kingY+i] === `q${usedColor}`) return true;
-      if (board[kingX-i][kingY+i]) break;
-    }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 5); i++) {
-      if (board[kingX+i][kingY+i] === `b${usedColor}` || board[kingX+i][kingY+i] === `q${usedColor}`) return true;
-      if (board[kingX+i][kingY+i]) break;
-    }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 6); i++) {
-      if (board[kingX+i][kingY-i] === `b${usedColor}` || board[kingX+i][kingY-i] === `q${usedColor}`) return true;
-      if (board[kingX+i][kingY-i]) break;
-    }
-    for (let i = 1; i <= spacesLen(kingX, kingY, 7); i++) {
-      if (board[kingX-i][kingY-i] === `b${usedColor}` || board[kingX-i][kingY-i] === `q${usedColor}`) return true;
-      if (board[kingX-i][kingY-i]) break;
-    }
-    return false;
-  }
     if (board[x][y]?.[1] === color && !selected && !destinated && !promotingSquare && mode === 1) { // If the clicked square has a piece and is their current turn...
       setSelectedSquare([x, y]);
       let lst = []; // We add possible moves to this array and setDestinationSquares to this at the end
@@ -450,8 +554,8 @@ export default function ChessBoard({ mode, setMode }) {
         case `p${color}`:
           let mod = -turn;
           let startPoint = turn === 1 ? 6 : 1;
-          if (!board[x][y+1*mod] && canMove(x, y+1*mod)) lst.push([x, y+1*mod]);
-          if (y === startPoint && !board[x][y+2*mod] && canMove(x, y+2*mod)) lst.push([x, y+2*mod]);
+          if (canMove(x, y+1*mod) && !board[x][y+1*mod]) lst.push([x, y+1*mod]);
+          if (canMove(x, y+2*mod) && !board[x][y+2*mod] && y === startPoint) lst.push([x, y+2*mod]);
           if (canMove(x-1, y+1*mod) && board[x-1][y+1*mod]) lst.push([x-1, y+1*mod]);
           if (canMove(x+1, y+1*mod) && board[x+1][y+1*mod]) lst.push([x+1, y+1*mod]);
           if (canMove(x-1, y+1*mod) && x === enPassantSquare?.[0] + 1 && y === enPassantSquare[1]) lst.push([x-1, y+1*mod]);
@@ -610,18 +714,19 @@ export default function ChessBoard({ mode, setMode }) {
         }
       }
       else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]); // Checks for promotion
+      if (kingInCheck(updatedBoard, true)) { // If opposing king is in check...
+        checkSoundEffect.play();
+        if (checkmated(updatedBoard)) {
+          setMode(2);
+          turn === 1 ? setBlackWins(blackWins + 1) : setWhiteWins(whiteWins + 1);
+        }
+      } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
       else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
         updatedBoard[enPassantSquare[0]][enPassantSquare[1]] = null;
         addPoint('p');
         captureSoundEffect.play();
-      } else if (kingInCheck(updatedBoard, true)) {
-        const win = checkmated(updatedBoard, opposingColor)
-        checkSoundEffect.play(); // Plays checkSoundEffect if opposing team is in check...
-        console.log("check: " + color)
-        if (win) console.log("checkmate: " + color + " wins!")
-      } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
-      else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
-      if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
+      } else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
+      else if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
         addPoint(board[x][y]);
         captureSoundEffect.play();
       }

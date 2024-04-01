@@ -13,6 +13,8 @@ const gameEndSoundEffect = new Audio(gameEndAudio);
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame
+  const [whiteWins, setWhiteWins] = React.useState(0);
+  const [blackWins, setBlackWins] = React.useState(0);
   let buttonText;
   let buttonColor;
   let startButtonIcon;
@@ -63,14 +65,14 @@ export default function MainContent() {
       </Button>
       <Stack>
         <Stack direction="row" justifyContent="space-around" bgcolor="grey">
-          <Typography color="white">
-            DISPLAY WHO WON HERE
+          <Typography color="white" fontSize={20} fontWeight="bold">
+            White: {whiteWins}
           </Typography>
-          <Typography color="white">
-            DISPLAY WHO WON HERE
+          <Typography color="white" fontSize={20} fontWeight="bold">
+            Black: {blackWins}
           </Typography>
         </Stack>
-        <ChessBoard mode={mode} setMode={setMode} />
+        <ChessBoard mode={mode} setMode={setMode} whiteWins={whiteWins} blackWins={blackWins} setWhiteWins={setWhiteWins} setBlackWins={setBlackWins} />
       </Stack>
     </Stack>
   )
