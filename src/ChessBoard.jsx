@@ -28,26 +28,26 @@ const checkSoundEffect = new Audio(checkAudio);
 const promoteSoundEffect = new Audio(promoteAudio);
 const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
-function Timer({ turn, timerFor, mode, promotingSquare, setMode }) {
+function Timer(props) {
   const [seconds, setSeconds] = React.useState(600);
   let color = seconds <= 10 ? "red" : "white";
   React.useEffect(() => { // useEffect for timer
-    if ((promotingSquare ? turn !== timerFor : turn === timerFor) && mode === 1) {
+    if ((props.promotingSquare ? props.turn !== props.timerFor : props.turn === props.timerFor) && props.mode === 1) {
       const chessTimer = setInterval(() => {
         setSeconds(prevSeconds => prevSeconds - 1);
       }, 1000);
       return () => clearInterval(chessTimer);
     }
   // eslint-disable-next-line
-  }, [turn, mode, promotingSquare]);
-  React.useEffect(() => {if (mode === 1) setSeconds(600)}, [mode]); // Resets timer on new game
+  }, [props.turn, props.mode, props.promotingSquare]);
+  React.useEffect(() => {if (props.mode === 1) setSeconds(600)}, [props.mode]); // Resets timer on new game
   function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   if (seconds === 10) tenSecondsSoundEffect.play();
-  else if (seconds === 0) setMode(2);
+  else if (seconds === 0) props.setMode(2);
 
   return (
     <Box border="solid" borderColor={color} borderRadius={1} padding={1}>
@@ -58,7 +58,25 @@ function Timer({ turn, timerFor, mode, promotingSquare, setMode }) {
   )
 }
 
-function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare, setMode }) {
+function MoveHistory({ whiteMoves, blackMoves }) {
+  function MoveBox({ move }) {
+    return (
+      <Box>
+        <Typography color="white">
+          {move}
+        </Typography>
+      </Box>
+    )
+  }
+  return (
+    <Stack direction="row" spacing={2}>
+      {Array.from(Array(whiteMoves)).map(move => <MoveBox move={move} />)}
+      {Array.from(Array(blackMoves)).map(move => <MoveBox move={move} />)}
+    </Stack>
+  )
+}
+
+function SideBar(props) {
   return (
     <Stack bgcolor="#4B4847" justifyContent="space-between" padding={2}>
       <Stack>
@@ -67,18 +85,19 @@ function SideBar({ mode, turn, pointsWhite, pointsBlack, promotingSquare, setMod
             userSelect: "none"
           }}
         >
-          {pointsBlack > pointsWhite ? `+${pointsBlack - pointsWhite}` : null}
+          {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
         </Typography>
-        <Timer turn={turn} timerFor={1} mode={mode} promotingSquare={promotingSquare} setMode={setMode} />
+        <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
       </Stack>
+      <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
       <Stack>
-        <Timer turn={turn} timerFor={-1} mode={mode} promotingSquare={promotingSquare} setMode={setMode} />
+        <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
         <Typography color="white" fontSize={20}
           sx={{
             userSelect: "none"
           }}
         >
-          {pointsWhite > pointsBlack ? `+${pointsWhite - pointsBlack}` : null}
+          {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
         </Typography>
       </Stack>
     </Stack>
@@ -200,6 +219,8 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
   ];
   const [board, setBoard] = React.useState(initialBoard);
   const [turn, setTurn] = React.useState(-1); // -1: White's turn || 1: Black's turn
+  const [whiteMoves, setWhiteMoves] = React.useState([]);
+  const [blackMoves, setBlackMoves] = React.useState([]);
   const [pointsWhite, setPointsWhite] = React.useState(0);
   const [pointsBlack, setPointsBlack] = React.useState(0);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
@@ -214,6 +235,8 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
     if (mode === 1) { // if a new game starts
       setBoard(initialBoard);
       setTurn(-1);
+      setWhiteMoves([]);
+      setBlackMoves([]);
       setPointsWhite(0);
       setPointsBlack(0);
       setCastleStateWhite(0);
@@ -673,9 +696,19 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
           throw new Error("Invalid piece!");
       }
     } else if (destinated) { // If the clicked square is destinated...
-      let castle = false;
+      const selectedPiece = board[selectedSquare[0]][selectedSquare[1]];
+      // Constructing move notation
+      let whiteMove = '', blackMove = '';
+      function editMove(notation, setTo=false) {
+        if (setTo) turn === 1 ? blackMove = notation : whiteMove = notation;
+        else turn === 1 ? blackMove += notation : whiteMove += notation;
+      }
+      if (selectedPiece !== `p${color}`) editMove(selectedPiece[0].toUpperCase());
+      if (board[x][y]) editMove('x');
+      editMove(String.fromCharCode(x + 97));
+      editMove(y + 1);
       // Setting states for castling
-      if (color === 'w') { // If white's turn...
+      if (turn === -1) {
         if (castleStateWhite === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 0) setCastleStateWhite(1);
           else if (selectedSquare[0] === 7 && selectedSquare[1] === 0) setCastleStateWhite(-1);
@@ -685,7 +718,7 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
           if (selectedSquare[0] === 7 && selectedSquare[1] === 0) setCastleStateWhite(2);
         }
         if (selectedSquare[0] === 4 && selectedSquare[1] === 0) setCastleStateWhite(2);
-      } else if (color === 'b') { // If black's turn...
+      } else if (turn === 1) {
         if (castleStateBlack === 0) {
           if (selectedSquare[0] === 0 && selectedSquare[1] === 7) setCastleStateBlack(1);
           else if (selectedSquare[0] === 7 && selectedSquare[1] === 7) setCastleStateBlack(-1);
@@ -697,31 +730,36 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
         if (selectedSquare[0] === 4 && selectedSquare[1] === 7) setCastleStateBlack(2);
       }
       // Checks if pawn moved 2 squares forward
-      if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && (y === selectedSquare[1] + 2 || y === selectedSquare[1] - 2)) setEnpassantSquare([x, y]);
+      if (selectedPiece === `p${color}` && (y === selectedSquare[1] + 2 || y === selectedSquare[1] - 2)) setEnpassantSquare([x, y]);
       const updatedBoard = board.map(row => [...row]); // Creates copy of board - changes will be made to this one
       updatedBoard[x][y] = updatedBoard[selectedSquare[0]][selectedSquare[1]];
       updatedBoard[selectedSquare[0]][selectedSquare[1]] = null;
       // Checks for castling
-      if (board[selectedSquare[0]][selectedSquare[1]] === `k${color}`) {
+      let castle = false;
+      if (selectedPiece === `k${color}`) {
         if (x === selectedSquare[0] - 2) {
           updatedBoard[x+1][y] = updatedBoard[0][y];
           updatedBoard[0][y] = null;
           castle = true;
+          editMove('0-0-0', true);
         } else if (x === selectedSquare[0] + 2) {
           updatedBoard[x-1][y] = updatedBoard[0][y];
           updatedBoard[7][y] = null;
           castle = true;
+          editMove('0-0', true);
         }
       }
-      else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]); // Checks for promotion
+      else if (selectedPiece === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]); // Checks for promotion
       if (kingInCheck(updatedBoard, true)) { // If opposing king is in check...
         checkSoundEffect.play();
-        if (checkmated(updatedBoard)) {
+        if (!checkmated(updatedBoard)) editMove('+');
+        else {
           setMode(2);
+          editMove('#');
           turn === 1 ? setBlackWins(blackWins + 1) : setWhiteWins(whiteWins + 1);
         }
       } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
-      else if (board[selectedSquare[0]][selectedSquare[1]] === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
+      else if (selectedPiece === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
         updatedBoard[enPassantSquare[0]][enPassantSquare[1]] = null;
         addPoint('p');
         captureSoundEffect.play();
@@ -733,12 +771,11 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
       // Sets board state to updated board and switches turn
       setBoard(updatedBoard);
       setTurn(-turn);
-      // Sets selectedSquares, destinationSquares, enpassantSquare, to null
       setSelectedSquare(null);
       setDestinationSquares(null);
-      if (enPassantSquare) {
-        setEnpassantSquare(null);
-      }
+      if (whiteMove) setWhiteMoves(prevArray => [...prevArray, whiteMove]);
+      else if (blackMove) setBlackMoves(prevArray => [...prevArray, blackMove]);
+      if (enPassantSquare) setEnpassantSquare(null);
     } else { // Otherwise, if the square is empty or not their turn...
       setSelectedSquare(null);
       setDestinationSquares(null);
@@ -753,7 +790,7 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
       <Stack direction="row" boxShadow={10}>
         {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
       </Stack>
-      <SideBar mode={mode} turn={turn} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} setMode={setMode} />
+      <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
     </Stack>
   )
 }

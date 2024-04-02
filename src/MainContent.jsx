@@ -78,17 +78,17 @@ export default function MainContent() {
       <Stack>
         <Stack direction="row" justifyContent="space-around" bgcolor="grey">
           { !winAnnouncement &&
-            <Typography color="white" fontSize={20} fontWeight="bold">
+            <Typography color="white" fontSize={24} fontWeight="bold">
               White: {whiteWins}
             </Typography>
           }
           { winAnnouncement &&
-            <Typography color="white" fontSize={20} fontWeight="bold">
+            <Typography color="white" fontSize={24} fontWeight="bold">
               {winAnnouncement}
             </Typography>
           }
           { !winAnnouncement &&
-            <Typography color="white" fontSize={20} fontWeight="bold">
+            <Typography color="white" fontSize={24} fontWeight="bold">
               Black: {blackWins}
             </Typography>
           }
