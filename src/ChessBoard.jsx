@@ -70,12 +70,8 @@ function MoveHistory({ whiteMoves, blackMoves }) {
   }
   return (
     <Stack direction="row" spacing={2}>
-      <Stack>
-        {whiteMoves.map(move => <MoveBox move={move} />)}
-      </Stack>
-      <Stack>
-        {blackMoves.map(move => <MoveBox move={move} />)}
-      </Stack>
+      {Array.from(Array(whiteMoves)).map(move => <MoveBox move={move} />)}
+      {Array.from(Array(blackMoves)).map(move => <MoveBox move={move} />)}
     </Stack>
   )
 }
