@@ -59,22 +59,22 @@ function Timer(props) {
 }
 
 function MoveHistory({ whiteMoves, blackMoves }) {
-  function MoveBox({ move }) {
+  function MoveBox({ move, color }) {
     return (
       <Box>
-        <Typography color="white">
+        <Typography color={color} fontWeight="bold">
           {move}
         </Typography>
       </Box>
     )
   }
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" justifyContent="space-around" bgcolor="grey" border="solid white" height={340} overflow="auto">
       <Stack>
-        {whiteMoves.map(move => <MoveBox move={move} />)}
+        {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
       </Stack>
       <Stack>
-        {blackMoves.map(move => <MoveBox move={move} />)}
+        {blackMoves.map(move => <MoveBox move={move} color="black" />)}
       </Stack>
     </Stack>
   )
