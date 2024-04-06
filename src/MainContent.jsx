@@ -55,7 +55,7 @@ export default function MainContent() {
   }, [blackWins]);
 
   return (
-    <Stack direction="row" justifyContent="space-between" mx={5}>
+    <Stack alignContent="center">
       <Button disableRipple disableElevation
         onClick={clickGameButton}
         variant="contained"
@@ -63,6 +63,7 @@ export default function MainContent() {
         endIcon={endButtonIcon}
         sx={{
           width: 220,
+          minWidth: 220,
           height: 75,
           fontSize: 20,
           fontWeight: "bold",
@@ -76,7 +77,7 @@ export default function MainContent() {
         {buttonText}
       </Button>
       <Stack>
-        <Stack direction="row" justifyContent="space-around" bgcolor="grey">
+        <Stack direction="row" justifyContent="space-around" bgcolor="grey" width={641}>
           { !winAnnouncement &&
             <Typography color="white" fontSize={24} fontWeight="bold">
               White: {whiteWins}
