@@ -69,7 +69,14 @@ function MoveHistory({ whiteMoves, blackMoves }) {
     )
   }
   return (
-    <Stack direction="row" justifyContent="space-around" bgcolor="grey" border="solid white" height={340} overflow="auto">
+    <Stack
+      direction="row"
+      justifyContent="space-around"
+      bgcolor="grey"
+      border="solid white"
+      height={340}
+      overflow="auto"
+    >
       <Stack>
         {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
       </Stack>
@@ -104,6 +111,28 @@ function SideBar(props) {
           {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
         </Typography>
       </Stack>
+    </Stack>
+  )
+}
+
+function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
+  return (
+    <Stack direction="row" justifyContent="space-around" bgcolor="grey" width={641}>
+      { !winAnnouncement &&
+        <Typography color="white" fontSize={24} fontWeight="bold">
+          White: {whiteWins}
+        </Typography>
+      }
+      { winAnnouncement &&
+        <Typography color="white" fontSize={24} fontWeight="bold">
+          {winAnnouncement}
+        </Typography>
+      }
+      { !winAnnouncement &&
+        <Typography color="white" fontSize={24} fontWeight="bold">
+          Black: {blackWins}
+        </Typography>
+      }
     </Stack>
   )
 }
@@ -210,7 +239,7 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
   )
 }
 
-export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhiteWins, setBlackWins }) {
+export default function ChessBoard({ mode, setMode }) {
   const initialBoard = [
     ['rw', 'pw', null, null, null, null, 'pb', 'rb'],
     ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
@@ -227,6 +256,9 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
   const [blackMoves, setBlackMoves] = React.useState([]);
   const [pointsWhite, setPointsWhite] = React.useState(0);
   const [pointsBlack, setPointsBlack] = React.useState(0);
+  const [whiteWins, setWhiteWins] = React.useState(0);
+  const [blackWins, setBlackWins] = React.useState(0);
+  const [winAnnouncement, setWinAnnouncement] = React.useState(null);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
@@ -245,14 +277,14 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
       setPointsBlack(0);
       setCastleStateWhite(0);
       setCastleStateBlack(0);
-    }
-    else if (mode === 2) { // if the game ends
+      setWinAnnouncement(null);
+    } else if (mode === 2) { // if the game ends
       setSelectedSquare(null);
       setDestinationSquares(null);
       setPromotingSquare(null);
     }
   // eslint-disable-next-line
-  }, [mode]);
+  }, [mode])
   function addPoint(pieceTaken, opposite=false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
@@ -758,9 +790,15 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
         checkSoundEffect.play();
         if (!checkmated(updatedBoard)) editMove('+');
         else {
-          setMode(2);
           editMove('#');
-          turn === 1 ? setBlackWins(blackWins + 1) : setWhiteWins(whiteWins + 1);
+          setMode(2);
+          if (turn === 1) {
+            setBlackWins(blackWins + 1);
+            setWinAnnouncement("Black wins!");
+          } else {
+            setWhiteWins(whiteWins + 1);
+            setWinAnnouncement("White wins!");
+          }
         }
       } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
       else if (selectedPiece === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
@@ -789,12 +827,15 @@ export default function ChessBoard({ mode, setMode, whiteWins, blackWins, setWhi
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Stack direction="row">
-      {promotingSquare && <PromotionCard />}
-      <Stack direction="row" boxShadow={10}>
-        {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
+    <Box m={4}>
+      <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} winAnnouncement={winAnnouncement} />
+      <Stack direction="row">
+        {promotingSquare && <PromotionCard />}
+        <Stack direction="row" boxShadow={10}>
+          {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
+        </Stack>
+        <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
       </Stack>
-      <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
-    </Stack>
+    </Box>
   )
 }

@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, darken } from "@mui/material";
+import { Button, Stack, darken } from "@mui/material";
 import { green, orange, red } from "@mui/material/colors";
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -13,9 +13,6 @@ const gameEndSoundEffect = new Audio(gameEndAudio);
 
 export default function MainContent() {
   const [mode, setMode] = React.useState(0); // 0 = Initial, 1 = InGame, 2 = EndGame
-  const [winAnnouncement, setWinAnnouncement] = React.useState(null);
-  const [whiteWins, setWhiteWins] = React.useState(0);
-  const [blackWins, setBlackWins] = React.useState(0);
   let buttonText;
   let buttonColor;
   let startButtonIcon;
@@ -28,34 +25,21 @@ export default function MainContent() {
     buttonText = "End game";
     buttonColor = red[600];
     endButtonIcon = <CancelIcon />;
+    gameStartSoundEffect.play();
   } else {
     buttonText = "Rematch";
     buttonColor = orange[600];
     endButtonIcon = <RefreshIcon />;
+    gameEndSoundEffect.play();
   }
   function clickGameButton() {
     if (mode === 0) setMode(1);
     else if (mode === 1) setMode(2);
     else setMode(1);
   }
-  React.useEffect(() => {
-    if (mode === 1) {
-      gameStartSoundEffect.play();
-      setWinAnnouncement(null);
-    }
-    else if (mode === 2) gameEndSoundEffect.play();
-  }, [mode]);
-  React.useEffect(() => {
-    if (mode === 2) setWinAnnouncement("White wins!");
-  // eslint-disable-next-line
-  }, [whiteWins]);
-  React.useEffect(() => {
-    if (mode === 2) setWinAnnouncement("Black wins!");
-  // eslint-disable-next-line
-  }, [blackWins]);
 
   return (
-    <Stack alignContent="center">
+    <Stack alignItems="center">
       <Button disableRipple disableElevation
         onClick={clickGameButton}
         variant="contained"
@@ -76,26 +60,7 @@ export default function MainContent() {
       >
         {buttonText}
       </Button>
-      <Stack>
-        <Stack direction="row" justifyContent="space-around" bgcolor="grey" width={641}>
-          { !winAnnouncement &&
-            <Typography color="white" fontSize={24} fontWeight="bold">
-              White: {whiteWins}
-            </Typography>
-          }
-          { winAnnouncement &&
-            <Typography color="white" fontSize={24} fontWeight="bold">
-              {winAnnouncement}
-            </Typography>
-          }
-          { !winAnnouncement &&
-            <Typography color="white" fontSize={24} fontWeight="bold">
-              Black: {blackWins}
-            </Typography>
-          }
-        </Stack>
-        <ChessBoard mode={mode} setMode={setMode} whiteWins={whiteWins} blackWins={blackWins} setWhiteWins={setWhiteWins} setBlackWins={setBlackWins} />
-      </Stack>
+      <ChessBoard mode={mode} setMode={setMode} />
     </Stack>
   )
 }

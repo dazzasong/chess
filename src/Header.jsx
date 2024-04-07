@@ -10,7 +10,7 @@ export default function Header() {
       bgcolor="black"
       height={70}
       width={window.innerWidth}
-      mb={2}
+      mb={4}
     >
       <Typography color="white" fontSize={40} ml={2}
         sx={{
