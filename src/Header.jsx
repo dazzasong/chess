@@ -8,8 +8,8 @@ export default function Header() {
       justifyContent="space-between"
       alignItems="center"
       bgcolor="black"
-      height={70}
       width={window.innerWidth}
+      height={70}
       mb={4}
     >
       <Typography color="white" fontSize={40} ml={2}

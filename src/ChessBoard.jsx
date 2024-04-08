@@ -50,7 +50,7 @@ function Timer(props) {
   else if (seconds === 0) props.setMode(2);
 
   return (
-    <Box border="solid" borderColor={color} borderRadius={1} padding={1}>
+    <Box border="solid" borderColor={color} borderRadius={1} p={1}>
       <Typography color={color} fontSize={20} fontWeight="bold">
         {formatTime(seconds)}
       </Typography>
@@ -61,26 +61,25 @@ function Timer(props) {
 function MoveHistory({ whiteMoves, blackMoves }) {
   function MoveBox({ move, color }) {
     return (
-      <Box>
-        <Typography color={color} fontWeight="bold">
-          {move}
-        </Typography>
-      </Box>
+      <Typography color={color} fontWeight="bold">
+        {move}
+      </Typography>
     )
   }
   return (
     <Stack
       direction="row"
-      justifyContent="space-around"
       bgcolor="grey"
-      border="solid white"
+      width={90}
       height={340}
+      px={1}
+      border="solid white"
       overflow="auto"
     >
-      <Stack>
+      <Stack width={45}>
         {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
       </Stack>
-      <Stack>
+      <Stack width={45}>
         {blackMoves.map(move => <MoveBox move={move} color="black" />)}
       </Stack>
     </Stack>
@@ -89,7 +88,7 @@ function MoveHistory({ whiteMoves, blackMoves }) {
 
 function SideBar(props) {
   return (
-    <Stack bgcolor="#4B4847" justifyContent="space-between" padding={2}>
+    <Stack bgcolor="#4B4847" justifyContent="space-around" alignItems="center" p={2}>
       <Stack>
         <Typography color="white" fontSize={20}
           sx={{
@@ -117,7 +116,7 @@ function SideBar(props) {
 
 function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
   return (
-    <Stack direction="row" justifyContent="space-around" bgcolor="grey" width={641}>
+    <Stack direction="row" justifyContent="space-around" alignItems="center" bgcolor="grey" height={50}>
       { !winAnnouncement &&
         <Typography color="white" fontSize={24} fontWeight="bold">
           White: {whiteWins}
@@ -193,7 +192,7 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         bgcolor={bgcolor}
         justifyContent="center"
         position="relative"
-        padding={0.2}
+        p={0.2}
       >
         <Typography fontWeight="bold"
           sx={{
@@ -366,7 +365,7 @@ export default function ChessBoard({ mode, setMode }) {
     return (
       <Stack
         border={"solid"}
-        padding={1}
+        p={1}
         spacing={2}
         sx={{
           backgroundImage: "linear-gradient(white, grey)"
@@ -827,7 +826,7 @@ export default function ChessBoard({ mode, setMode }) {
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Box m={4}>
+    <Box my={4}>
       <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} winAnnouncement={winAnnouncement} />
       <Stack direction="row">
         {promotingSquare && <PromotionCard />}
