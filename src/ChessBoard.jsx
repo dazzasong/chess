@@ -50,7 +50,7 @@ function Timer(props) {
   else if (seconds === 0) props.setMode(2);
 
   return (
-    <Box border="solid" borderColor={color} borderRadius={1} p={1}>
+    <Box width={52} p={1} border="solid" borderColor={color} borderRadius={1}>
       <Typography color={color} fontSize={20} fontWeight="bold">
         {formatTime(seconds)}
       </Typography>
@@ -70,16 +70,16 @@ function MoveHistory({ whiteMoves, blackMoves }) {
     <Stack
       direction="row"
       bgcolor="grey"
-      width={90}
+      width={120}
       height={340}
       px={1}
       border="solid white"
       overflow="auto"
     >
-      <Stack width={45}>
+      <Stack width={60}>
         {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
       </Stack>
-      <Stack width={45}>
+      <Stack width={60}>
         {blackMoves.map(move => <MoveBox move={move} color="black" />)}
       </Stack>
     </Stack>
@@ -88,35 +88,29 @@ function MoveHistory({ whiteMoves, blackMoves }) {
 
 function SideBar(props) {
   return (
-    <Stack bgcolor="#4B4847" justifyContent="space-around" alignItems="center" p={2}>
-      <Stack>
-        <Typography color="white" fontSize={20}
-          sx={{
-            userSelect: "none"
-          }}
-        >
-          {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
-        </Typography>
-        <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
-      </Stack>
+    <Stack bgcolor="#4B4847" justifyContent="space-around" px={2}>
+      <Typography color="white" fontSize={20} height={30}>
+        {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
+      </Typography>
+      <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
       <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
-      <Stack>
-        <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
-        <Typography color="white" fontSize={20}
-          sx={{
-            userSelect: "none"
-          }}
-        >
-          {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
-        </Typography>
-      </Stack>
+      <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
+      <Typography color="white" fontSize={20} height={30}>
+        {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
+      </Typography>
     </Stack>
   )
 }
 
 function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
   return (
-    <Stack direction="row" justifyContent="space-around" alignItems="center" bgcolor="grey" height={50}>
+    <Stack
+      direction="row"
+      justifyContent="space-around"
+      alignItems="center"
+      bgcolor="grey"
+      height={50}
+    >
       { !winAnnouncement &&
         <Typography color="white" fontSize={24} fontWeight="bold">
           White: {whiteWins}
@@ -194,11 +188,9 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         position="relative"
         p={0.2}
       >
-        <Typography fontWeight="bold"
+        <Typography fontWeight="bold" top={0} left={3}
           sx={{
-            position: "absolute",
-            top: 0, left: 3,
-            userSelect: "none"
+            position: "absolute"
           }}
         >
           {x === 0 ? y + 1 : null}
@@ -208,7 +200,6 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
             sx={{
               mr: 0.5,
               justifyContent: "center", alignItems: "center",
-              userSelect: "none"
             }}
           >
             <img src={src} alt="Chess piece" />
@@ -216,11 +207,9 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         }
         {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} />}
         {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center",  position: "absolute"}} />}
-        <Typography fontWeight="bold"
+        <Typography fontWeight="bold" bottom={0} right={2}
           sx={{
-            position: "absolute",
-            bottom: 0, right: 2,
-            userSelect: "none"
+            position: "absolute"
           }}
         >
           {y === 0 ? String.fromCharCode(x + 97) : null}
@@ -371,11 +360,7 @@ export default function ChessBoard({ mode, setMode }) {
           backgroundImage: "linear-gradient(white, grey)"
         }}
       >
-        <Typography fontSize={16} fontWeight="bold"
-          sx={{
-            userSelect: "none"
-          }}
-        >
+        <Typography fontSize={16} fontWeight="bold">
           Promote to..
         </Typography>
         <IconButton onClick={() => promote('q')} disableRipple>
@@ -826,15 +811,19 @@ export default function ChessBoard({ mode, setMode }) {
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Box my={4}>
-      <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} winAnnouncement={winAnnouncement} />
-      <Stack direction="row">
-        {promotingSquare && <PromotionCard />}
+    <Stack direction="row" my={4}
+      sx={{
+        userSelect: "none"
+      }}
+    >
+      {promotingSquare && <PromotionCard />}
+      <Box>
+        <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} winAnnouncement={winAnnouncement} />
         <Stack direction="row" boxShadow={10}>
           {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
         </Stack>
-        <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
-      </Stack>
-    </Box>
+      </Box>
+      <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
+    </Stack>
   )
 }

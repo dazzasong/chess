@@ -12,7 +12,7 @@ export default function Header() {
       height={70}
       mb={4}
     >
-      <Typography color="white" fontSize={40} ml={2}
+      <Typography color="white" fontSize={40} fontFamily="Tilt Neon" ml={2}
         sx={{
           userSelect: "none"
         }}
