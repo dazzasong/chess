@@ -75,6 +75,9 @@ function MoveHistory({ whiteMoves, blackMoves }) {
       px={1}
       border="solid white"
       overflow="auto"
+      sx={{
+        scrollbarWidth: "none"
+      }}
     >
       <Stack width={60}>
         {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
