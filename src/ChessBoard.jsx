@@ -66,6 +66,11 @@ function MoveHistory({ whiteMoves, blackMoves }) {
       </Typography>
     )
   }
+  // Everytime either whiteMoves or blackMoves update we automatically scroll to the bottom
+  React.useEffect(() => {
+    const scrollDiv = document.getElementById("moveContainer");
+    scrollDiv.scrollTop = scrollDiv.scrollHeight;
+  }, [whiteMoves, blackMoves]);
   return (
     <Stack
       direction="row"
@@ -75,6 +80,7 @@ function MoveHistory({ whiteMoves, blackMoves }) {
       px={1}
       border="solid white"
       overflow="auto"
+      id="moveContainer"
       sx={{
         scrollbarWidth: "none"
       }}
