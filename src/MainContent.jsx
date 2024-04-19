@@ -39,7 +39,7 @@ export default function MainContent() {
   }
 
   return (
-    <Stack alignItems="center">
+    <Stack alignItems="center" bgcolor="bisque" pb={4}>
       <Button disableRipple disableElevation
         onClick={clickGameButton}
         variant="contained"
@@ -49,6 +49,7 @@ export default function MainContent() {
           width: 220,
           minWidth: 220,
           height: 75,
+          m: 4,
           fontSize: 20,
           fontWeight: "bold",
           fontFamily: "Tilt Neon",

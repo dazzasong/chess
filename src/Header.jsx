@@ -10,14 +10,13 @@ export default function Header() {
       bgcolor="black"
       width={window.innerWidth}
       height={70}
-      mb={4}
     >
       <Typography color="white" fontSize={40} fontFamily="Tilt Neon" ml={2}
         sx={{
           userSelect: "none"
         }}
       >
-        Chess
+        Chess♙
       </Typography>
     </Stack>
   )
