@@ -104,7 +104,7 @@ function SideBar(props) {
       <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
       <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
       <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
-      <Typography color="white" fontSize={20} height={30}>
+      <Typography color="white" fontSize={20} fontFamily="Tilt Neon" height={30}>
         {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
       </Typography>
     </Stack>
