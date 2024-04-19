@@ -51,7 +51,7 @@ function Timer(props) {
 
   return (
     <Box width={52} p={1} border="solid" borderColor={color} borderRadius={1}>
-      <Typography color={color} fontSize={20} fontWeight="bold">
+      <Typography color={color} fontSize={20} fontWeight="bold" fontFamily="Tilt Neon">
         {formatTime(seconds)}
       </Typography>
     </Box>
@@ -121,17 +121,17 @@ function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
       height={50}
     >
       { !winAnnouncement &&
-        <Typography color="white" fontSize={24} fontWeight="bold">
+        <Typography color="white" fontSize={24} fontWeight="bold" fontFamily="Tilt Neon">
           White: {whiteWins}
         </Typography>
       }
       { winAnnouncement &&
-        <Typography color="white" fontSize={24} fontWeight="bold">
+        <Typography color="white" fontSize={24} fontWeight="bold" fontFamily="Tilt Neon">
           {winAnnouncement}
         </Typography>
       }
       { !winAnnouncement &&
-        <Typography color="white" fontSize={24} fontWeight="bold">
+        <Typography color="white" fontSize={24} fontWeight="bold" fontFamily="Tilt Neon">
           Black: {blackWins}
         </Typography>
       }

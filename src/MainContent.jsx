@@ -51,6 +51,7 @@ export default function MainContent() {
           height: 75,
           fontSize: 20,
           fontWeight: "bold",
+          fontFamily: "Tilt Neon",
           backgroundColor: buttonColor,
           textTransform: "none",
           ":hover": {
