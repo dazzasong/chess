@@ -97,14 +97,14 @@ function MoveHistory({ whiteMoves, blackMoves }) {
 
 function SideBar(props) {
   return (
-    <Stack bgcolor="#4B4847" justifyContent="space-around" px={2}>
-      <Typography color="white" fontSize={20} height={30}>
+    <Stack bgcolor="#4B4847" justifyContent="space-around" p={2}>
+      <Typography color="white" fontSize={20} height={10}>
         {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
       </Typography>
       <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
       <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
       <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
-      <Typography color="white" fontSize={20} fontFamily="Tilt Neon" height={30}>
+      <Typography color="white" fontSize={20} fontFamily="Tilt Neon" height={10}>
         {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
       </Typography>
     </Stack>
