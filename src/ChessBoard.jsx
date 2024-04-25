@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
@@ -19,7 +20,6 @@ import checkAudio from "./assets/sounds/check.mp3";
 import castleAudio from "./assets/sounds/castle.mp3";
 import promoteAudio from "./assets/sounds/promote.mp3";
 import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
-import React from "react";
 
 const moveSoundEffect = new Audio(moveAudio);
 const captureSoundEffect = new Audio(captureAudio);
@@ -55,7 +55,7 @@ function Timer(props) {
         {formatTime(seconds)}
       </Typography>
     </Box>
-  )
+  );
 }
 
 function MoveHistory({ whiteMoves, blackMoves }) {
@@ -64,7 +64,7 @@ function MoveHistory({ whiteMoves, blackMoves }) {
       <Typography color={color} fontFamily="Tilt Neon">
         {move}
       </Typography>
-    )
+    );
   }
   // Everytime either whiteMoves or blackMoves update we automatically scroll to the bottom
   React.useEffect(() => {
@@ -92,7 +92,7 @@ function MoveHistory({ whiteMoves, blackMoves }) {
         {blackMoves.map(move => <MoveBox move={move} color="black" />)}
       </Stack>
     </Stack>
-  )
+  );
 }
 
 function SideBar(props) {
@@ -108,7 +108,7 @@ function SideBar(props) {
         {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
       </Typography>
     </Stack>
-  )
+  );
 }
 
 function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
@@ -136,7 +136,7 @@ function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
         </Typography>
       }
     </Stack>
-  )
+  );
 }
 
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
@@ -225,7 +225,7 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         </Typography>
       </Stack>
     </div>
-  )
+  );
 }
 
 function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare }) {
@@ -233,7 +233,7 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
     <Stack direction="column-reverse">
       {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} destinated={destinationY.includes(y)} clickSquare={clickSquare} />)}
     </Stack>
-  )
+  );
 }
 
 export default function ChessBoard({ mode, setMode }) {
@@ -388,7 +388,7 @@ export default function ChessBoard({ mode, setMode }) {
           <img src={promotionsrc('b')} alt={color ? "Black Bishop" : "White Bishop"} />
         </IconButton>
       </Stack>
-    )
+    );
   }
   function clickSquare(x, y, selected, destinated) { // function when a square is clicked
     // Checks if move is within bounds
@@ -834,5 +834,5 @@ export default function ChessBoard({ mode, setMode }) {
       </Box>
       <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
     </Stack>
-  )
+  );
 }
