@@ -1,8 +1,8 @@
 Hello! I am Darren and I started this 3-month project on 12/01/2024. This is a chess website created using React on Javascript. I have also used some MUI features on this website.
 
-I was in highschool in the time I started and finished this project. I finished ver. 1.0 by 3/04/2024.
+I was at year 8 in the time of completion. Version 1.0 was completed by April of 2024, and is hosted live on Netlify: https://dschess.netlify.app
 
-Making this project has taught me a lot of coding knowledge, and I had some fun making it. I hope you enjoy!
+I've had a lot of fun working on this project, and it has taught me a lot of programming basics and simple web development with React.
 
 -- Devlog --
 
