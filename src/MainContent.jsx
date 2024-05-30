@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 import { Button, Stack, darken } from "@mui/material";
 import { green, orange, red } from "@mui/material/colors";
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
-import CancelIcon from '@mui/icons-material/Cancel';
+import FlagIcon from '@mui/icons-material/Flag';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import gameStartAudio from "./assets/sounds/game-start.mp3";
 import gameEndAudio from "./assets/sounds/game-end.mp3";
@@ -18,16 +18,16 @@ export default function MainContent() {
   let startButtonIcon;
   let endButtonIcon;
   if (mode === 0) {
-    buttonText = "Start new game";
+    buttonText = 'Start new game';
     buttonColor = green[600];
     startButtonIcon = <LocalFireDepartmentIcon />;
   } else if (mode === 1) {
-    buttonText = "End game";
+    buttonText = 'Forfeit';
     buttonColor = red[600];
-    endButtonIcon = <CancelIcon />;
+    endButtonIcon = <FlagIcon />;
     gameStartSoundEffect.play();
   } else {
-    buttonText = "Rematch";
+    buttonText = 'Rematch';
     buttonColor = orange[600];
     endButtonIcon = <RefreshIcon />;
     gameEndSoundEffect.play();
@@ -39,23 +39,28 @@ export default function MainContent() {
   }
 
   return (
-    <Stack alignItems="center" bgcolor="bisque" pb={4}>
+    <Stack
+      alignItems='center'
+      bgcolor='bisque'
+      width='100vw'
+      height='100vh'
+      position='fixed'
+    >
       <Button disableRipple disableElevation
         onClick={clickGameButton}
-        variant="contained"
+        variant='contained'
         startIcon={startButtonIcon}
         endIcon={endButtonIcon}
         sx={{
-          width: 220,
           minWidth: 220,
-          height: 75,
+          height: 100,
           m: 4,
           fontSize: 20,
-          fontWeight: "bold",
-          fontFamily: "Tilt Neon",
+          fontWeight: 'bold',
+          fontFamily: 'Tilt Neon',
           backgroundColor: buttonColor,
-          textTransform: "none",
-          ":hover": {
+          textTransform: 'none',
+          ':hover': {
             backgroundColor: darken(buttonColor, 0.1)
           }
         }}

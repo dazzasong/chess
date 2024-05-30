@@ -30,7 +30,7 @@ const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
 
 function Timer(props) {
   const [seconds, setSeconds] = React.useState(600);
-  let color = seconds <= 10 ? "red" : "white";
+  let color = seconds <= 10 ? 'red' : 'white';
   React.useEffect(() => { // useEffect for timer
     if ((props.promotingSquare ? props.turn !== props.timerFor : props.turn === props.timerFor) && props.mode === 1) {
       const chessTimer = setInterval(() => {
@@ -40,18 +40,22 @@ function Timer(props) {
     }
   // eslint-disable-next-line
   }, [props.turn, props.mode, props.promotingSquare]);
-  React.useEffect(() => {if (props.mode === 1) setSeconds(600)}, [props.mode]); // Resets timer on new game
+  React.useEffect(() => {if (props.mode === 1) setSeconds(10)}, [props.mode]); // Resets timer on new game
   function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
-  if (seconds === 10) tenSecondsSoundEffect.play();
-  else if (seconds === 0) props.setMode(2);
-
+  React.useEffect(() => {
+    if (seconds === 10) tenSecondsSoundEffect.play();
+    else if (seconds === 0) {
+      props.setMode(2);
+      props.timerFor === 1 ? props.setWhiteWins(props.whiteWins + 1) : props.setBlackWins(props.blackWins + 1);
+    }
+  }, [seconds])
   return (
-    <Box width={52} p={1} border="solid" borderColor={color} borderRadius={1}>
-      <Typography color={color} fontSize={20} fontWeight="bold" fontFamily="Tilt Neon">
+    <Box width={52} p={1} border='solid' borderColor={color} borderRadius={1}>
+      <Typography color={color} fontSize={20} fontWeight='bold' fontFamily='Tilt Neon'>
         {formatTime(seconds)}
       </Typography>
     </Box>
@@ -61,35 +65,35 @@ function Timer(props) {
 function MoveHistory({ whiteMoves, blackMoves }) {
   function MoveBox({ move, color }) {
     return (
-      <Typography color={color} fontFamily="Tilt Neon">
+      <Typography color={color} fontFamily='Tilt Neon'>
         {move}
       </Typography>
     );
   }
   // Everytime either whiteMoves or blackMoves update we automatically scroll to the bottom
   React.useEffect(() => {
-    const scrollDiv = document.getElementById("moveContainer");
+    const scrollDiv = document.getElementById('moveContainer');
     scrollDiv.scrollTop = scrollDiv.scrollHeight;
   }, [whiteMoves, blackMoves]);
   return (
     <Stack
-      direction="row"
-      bgcolor="grey"
+      direction='row'
+      bgcolor='grey'
       width={120}
       height={340}
       px={1}
-      border="solid white"
-      overflow="auto"
-      id="moveContainer"
+      border='solid white'
+      overflow='auto'
+      id='moveContainer'
       sx={{
-        scrollbarWidth: "none"
+        scrollbarWidth: 'none'
       }}
     >
       <Stack width={60}>
-        {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
+        {whiteMoves.map(move => <MoveBox move={move} color='white' />)}
       </Stack>
       <Stack width={60}>
-        {blackMoves.map(move => <MoveBox move={move} color="black" />)}
+        {blackMoves.map(move => <MoveBox move={move} color='black' />)}
       </Stack>
     </Stack>
   );
@@ -97,41 +101,41 @@ function MoveHistory({ whiteMoves, blackMoves }) {
 
 function SideBar(props) {
   return (
-    <Stack bgcolor="#4B4847" justifyContent="space-around" p={2}>
-      <Typography color="white" fontSize={20} height={10}>
+    <Stack bgcolor='#4B4847' justifyContent='space-around' p={2}>
+      <Typography color='white' fontSize={20} height={10}>
         {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
       </Typography>
-      <Timer turn={props.turn} timerFor={1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
+      <Timer timerFor={1} turn={props.turn} mode={props.mode} setMode={props.setMode} whiteWins={props.whiteWins} blackWins={props.blackWins} setWhiteWins={props.setWhiteWins} setBlackWins={props.setBlackWins} promotingSquare={props.promotingSquare} />
       <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
-      <Timer turn={props.turn} timerFor={-1} mode={props.mode} setMode={props.setMode} promotingSquare={props.promotingSquare} />
-      <Typography color="white" fontSize={20} fontFamily="Tilt Neon" height={10}>
+      <Timer timerFor={-1} turn={props.turn} mode={props.mode} setMode={props.setMode} whiteWins={props.whiteWins} blackWins={props.blackWins} setWhiteWins={props.setWhiteWins} setBlackWins={props.setBlackWins} promotingSquare={props.promotingSquare} />
+      <Typography color='white' fontSize={20} fontFamily='Tilt Neon' height={10}>
         {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
       </Typography>
     </Stack>
   );
 }
 
-function ScoreBoard({ whiteWins, blackWins, winAnnouncement }) {
+function ScoreBoard({ whiteWins, blackWins, scoreboardAnnouncement }) {
   return (
     <Stack
-      direction="row"
-      justifyContent="space-around"
-      alignItems="center"
-      bgcolor="grey"
+      direction='row'
+      justifyContent='space-around'
+      alignItems='center'
+      bgcolor='grey'
       height={50}
     >
-      { !winAnnouncement &&
-        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
+      { !scoreboardAnnouncement &&
+        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
           White: {whiteWins}
         </Typography>
       }
-      { winAnnouncement &&
-        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
-          {winAnnouncement}
+      { scoreboardAnnouncement &&
+        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
+          {scoreboardAnnouncement}
         </Typography>
       }
-      { !winAnnouncement &&
-        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
+      { !scoreboardAnnouncement &&
+        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
           Black: {blackWins}
         </Typography>
       }
@@ -183,9 +187,9 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
     default:
       src = null;
   }
-  if (shaded) bgcolor = "#b58863";
-  else bgcolor = "#f0d9B5";
-  if (selected) bgcolor = "#ffff77";
+  if (shaded) bgcolor = '#b58863';
+  else bgcolor = '#f0d9B5';
+  if (selected) bgcolor = '#ffff77';
 
   return (
     <div onClick={() => clickSquare(x, y, selected, destinated)}>
@@ -193,13 +197,13 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         width={64}
         height={64}
         bgcolor={bgcolor}
-        justifyContent="center"
-        position="relative"
+        justifyContent='center'
+        position='relative'
         p={0.2}
       >
-        <Typography fontWeight="bold" top={0} left={3}
+        <Typography fontWeight='bold' top={0} left={3}
           sx={{
-            position: "absolute"
+            position: 'absolute'
           }}
         >
           {x === 0 ? y + 1 : null}
@@ -208,17 +212,17 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
           <Stack
             sx={{
               mr: 0.5,
-              justifyContent: "center", alignItems: "center",
+              justifyContent: 'center', alignItems: 'center',
             }}
           >
-            <img src={src} alt="Chess piece" />
+            <img src={src} alt='Chess piece' />
           </Stack>
         }
-        {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: "center"}} />}
-        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: "center",  position: "absolute"}} />}
-        <Typography fontWeight="bold" bottom={0} right={2}
+        {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: 'center'}} />}
+        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: 'center',  position: 'absolute'}} />}
+        <Typography fontWeight='bold' bottom={0} right={2}
           sx={{
-            position: "absolute"
+            position: 'absolute'
           }}
         >
           {y === 0 ? String.fromCharCode(x + 97) : null}
@@ -230,7 +234,7 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
 
 function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare }) {
   return (
-    <Stack direction="column-reverse">
+    <Stack direction='column-reverse'>
       {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} destinated={destinationY.includes(y)} clickSquare={clickSquare} />)}
     </Stack>
   );
@@ -255,7 +259,7 @@ export default function ChessBoard({ mode, setMode }) {
   const [pointsBlack, setPointsBlack] = React.useState(0);
   const [whiteWins, setWhiteWins] = React.useState(0);
   const [blackWins, setBlackWins] = React.useState(0);
-  const [winAnnouncement, setWinAnnouncement] = React.useState(null);
+  const [scoreboardAnnouncement, setScoreboardAnnouncement] = React.useState(null);
   const [selectedSquare, setSelectedSquare] = React.useState(null);
   const [destinationSquares, setDestinationSquares] = React.useState(null);
   const [castleStateWhite, setCastleStateWhite] = React.useState(0); // 0: Can castle both sides || -1: Can only castle left side || 1: Can only castle right side || 2: Cannot castle
@@ -274,7 +278,7 @@ export default function ChessBoard({ mode, setMode }) {
       setPointsBlack(0);
       setCastleStateWhite(0);
       setCastleStateBlack(0);
-      setWinAnnouncement(null);
+      setScoreboardAnnouncement(null);
     } else if (mode === 2) { // if the game ends
       setSelectedSquare(null);
       setDestinationSquares(null);
@@ -322,7 +326,7 @@ export default function ChessBoard({ mode, setMode }) {
       case 5: return Math.min(7 - y, 7 - x);
       case 6: return Math.min(y, 7 - x);
       case 7: return Math.min(y, x);
-      default: throw new Error("Invalid direction!");
+      default: throw new Error('Invalid direction!');
     }
   }
   function PromotionCard() {
@@ -343,7 +347,7 @@ export default function ChessBoard({ mode, setMode }) {
         case 'b':
           addPoint(0, true, 2);
           break;
-        default: throw new Error("Invalid promotionPiece!");
+        default: throw new Error('Invalid promotionPiece!');
       }
     }
     function promotionsrc(piece) {
@@ -356,36 +360,36 @@ export default function ChessBoard({ mode, setMode }) {
           return turn === 1 ? whiteKnight : blackKnight;
         case 'b':
           return turn === 1 ? whiteBishop : blackBishop;
-        default: throw new Error("Invalid piece!");
+        default: throw new Error('Invalid piece!');
       }
     }
 
     return (
       <Stack
-        border={"solid"}
+        border={'solid'}
         p={1}
         spacing={2}
         sx={{
-          backgroundImage: "linear-gradient(white, grey)"
+          backgroundImage: 'linear-gradient(white, grey)'
         }}
       >
-        <Typography fontSize={16} fontWeight="bold">
+        <Typography fontSize={16} fontWeight='bold'>
           Promote to..
         </Typography>
         <IconButton onClick={() => promote('q')} disableRipple>
-          <img src={promotionsrc('q')} alt={color ? "Black Queen" : "White Queen"} />
+          <img src={promotionsrc('q')} alt={color ? 'Black Queen' : 'White Queen'} />
         </IconButton>
         -
         <IconButton onClick={() => promote('r')} disableRipple>
-          <img src={promotionsrc('r')} alt={color ? "Black Rook" : "White Rook"} />
+          <img src={promotionsrc('r')} alt={color ? 'Black Rook' : 'White Rook'} />
         </IconButton>
         -
         <IconButton onClick={() => promote('n')} disableRipple>
-          <img src={promotionsrc('n')} alt={color ? "Black Knight" : "White Knight"} />
+          <img src={promotionsrc('n')} alt={color ? 'Black Knight' : 'White Knight'} />
         </IconButton>
         -
         <IconButton onClick={() => promote('b')} disableRipple>
-          <img src={promotionsrc('b')} alt={color ? "Black Bishop" : "White Bishop"} />
+          <img src={promotionsrc('b')} alt={color ? 'Black Bishop' : 'White Bishop'} />
         </IconButton>
       </Stack>
     );
@@ -585,7 +589,7 @@ export default function ChessBoard({ mode, setMode }) {
               canMove(x-1, y-1, board, true, x, y)) return true;
           return false;
         default:
-          throw new Error("Invalid piece!");
+          throw new Error('Invalid piece!');
       }
     }
     function checkmated(board) {
@@ -722,7 +726,7 @@ export default function ChessBoard({ mode, setMode }) {
           setDestinationSquares(lst);
           break;
         default:
-          throw new Error("Invalid piece!");
+          throw new Error('Invalid piece!');
       }
     } else if (destinated) { // If the clicked square is destinated...
       const selectedPiece = board[selectedSquare[0]][selectedSquare[1]];
@@ -787,10 +791,10 @@ export default function ChessBoard({ mode, setMode }) {
           setMode(2);
           if (turn === 1) {
             setBlackWins(blackWins + 1);
-            setWinAnnouncement("Black wins!");
+            setScoreboardAnnouncement('Black wins!');
           } else {
             setWhiteWins(whiteWins + 1);
-            setWinAnnouncement("White wins!");
+            setScoreboardAnnouncement('White wins!');
           }
         }
       } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
@@ -820,19 +824,19 @@ export default function ChessBoard({ mode, setMode }) {
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Stack direction="row"
+    <Stack direction='row'
       sx={{
-        userSelect: "none"
+        userSelect: 'none'
       }}
     >
       {promotingSquare && <PromotionCard />}
       <Box>
-        <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} winAnnouncement={winAnnouncement} />
-        <Stack direction="row" boxShadow={10}>
+        <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} scoreboardAnnouncement={scoreboardAnnouncement} />
+        <Stack direction='row' boxShadow={10}>
           {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
         </Stack>
       </Box>
-      <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} promotingSquare={promotingSquare} />
+      <SideBar turn={turn} mode={mode} setMode={setMode} whiteMoves={whiteMoves} blackMoves={blackMoves} pointsWhite={pointsWhite} pointsBlack={pointsBlack} whiteWins={whiteWins} blackWins={blackWins} setWhiteWins={setWhiteWins} setBlackWins={setBlackWins} promotingSquare={promotingSquare} />
     </Stack>
   );
 }
