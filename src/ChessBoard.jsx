@@ -40,7 +40,7 @@ function Timer(props) {
     }
   // eslint-disable-next-line
   }, [props.turn, props.mode, props.promotingSquare]);
-  React.useEffect(() => {if (props.mode === 1) setSeconds(10)}, [props.mode]); // Resets timer on new game
+  React.useEffect(() => {if (props.mode === 1) setSeconds(600)}, [props.mode]); // Resets timer on new game
   function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
