@@ -38,10 +38,7 @@ export default function MainContent() {
     else setMode(1);
   }
   return (
-    <Stack
-      alignItems='center'
-      bgcolor='bisque'
-    >
+    <Stack bgcolor='bisque' alignItems='center'>
       <Button disableRipple disableElevation
         onClick={clickGameButton}
         variant='contained'

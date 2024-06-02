@@ -267,6 +267,7 @@ export default function ChessBoard({ mode, setMode }) {
   const [castleStateBlack, setCastleStateBlack] = React.useState(0);
   const [promotingSquare, setPromotingSquare] = React.useState(null);
   const [enPassantSquare, setEnpassantSquare] = React.useState(null);
+  const [isCheckmate, setIsCheckmate] = React.useState(0);
   const color = turn === 1 ? 'b' : 'w';
   const opposingColor = turn === -1 ? 'b' : 'w';
   React.useEffect(() => {
@@ -280,10 +281,15 @@ export default function ChessBoard({ mode, setMode }) {
       setCastleStateWhite(0);
       setCastleStateBlack(0);
       setScoreboardAnnouncement(null);
+      setIsCheckmate(0);
     } else if (mode === 2) { // if the game ends
       setSelectedSquare(null);
       setDestinationSquares(null);
       setPromotingSquare(null);
+      if (isCheckmate === 0) {
+        turn === 1 ? setWhiteWins(whiteWins + 1) : setBlackWins(blackWins + 1);
+        setScoreboardAnnouncement(`${turn === 1 ? 'White' : 'Black'} wins - Forfeit`);
+      }
     }
   // eslint-disable-next-line
   }, [mode])
@@ -790,13 +796,9 @@ export default function ChessBoard({ mode, setMode }) {
         else {
           editMove('#');
           setMode(2);
-          if (turn === 1) {
-            setBlackWins(blackWins + 1);
-            setScoreboardAnnouncement('Black wins - Checkmate');
-          } else {
-            setWhiteWins(whiteWins + 1);
-            setScoreboardAnnouncement('White wins! - Checkmate');
-          }
+          turn === 1 ? setBlackWins(blackWins + 1) : setWhiteWins(whiteWins + 1);
+          turn === 1 ? setScoreboardAnnouncement('Black wins - Checkmate') : setScoreboardAnnouncement('White wins! - Checkmate');
+          setIsCheckmate(1);
         }
       } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
       else if (selectedPiece === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
