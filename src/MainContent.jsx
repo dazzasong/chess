@@ -41,8 +41,6 @@ export default function MainContent() {
     <Stack
       alignItems='center'
       bgcolor='bisque'
-      width='100vw'
-      height='100vh'
     >
       <Button disableRipple disableElevation
         onClick={clickGameButton}

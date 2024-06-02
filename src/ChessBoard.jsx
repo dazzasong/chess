@@ -825,10 +825,7 @@ export default function ChessBoard({ mode, setMode }) {
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Stack direction='row'
-      sx={{
-        userSelect: 'none'
-      }}
+    <Stack direction='row' sx={{ userSelect: 'none' }}
     >
       {promotingSquare && <PromotionCard />}
       <Box>
