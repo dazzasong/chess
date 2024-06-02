@@ -37,14 +37,12 @@ export default function MainContent() {
     else if (mode === 1) setMode(2);
     else setMode(1);
   }
-
   return (
     <Stack
       alignItems='center'
       bgcolor='bisque'
       width='100vw'
       height='100vh'
-      position='fixed'
     >
       <Button disableRipple disableElevation
         onClick={clickGameButton}
@@ -53,7 +51,7 @@ export default function MainContent() {
         endIcon={endButtonIcon}
         sx={{
           minWidth: 220,
-          height: 100,
+          height: 75,
           m: 4,
           fontSize: 20,
           fontWeight: 'bold',

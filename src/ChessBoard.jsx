@@ -51,6 +51,7 @@ function Timer(props) {
     else if (seconds === 0) {
       props.setMode(2);
       props.timerFor === 1 ? props.setWhiteWins(props.whiteWins + 1) : props.setBlackWins(props.blackWins + 1);
+      props.setScoreboardAnnouncement(props.timerFor === 1 ? "White wins - Time ran out" : "Black wins - Time ran out")
     }
   }, [seconds])
   return (
@@ -480,12 +481,13 @@ export default function ChessBoard({ mode, setMode }) {
       return false;
     }
     // In the current board state, can the piece, at position (x,y) make any of its potential moves, without leaving the king in check
-    function pieceCanMove(x, y, board) {
+    function opposingPiecesCanMove(x, y, board) {
       switch (board[x][y]) {
         // Pawn moves
         case `p${opposingColor}`:
           let mod = turn;
-          let startPoint = turn === 1 ? 6 : 1;
+          let startPoint = turn === 1 ? 1 : 6;
+          console.log(startPoint)
           if ((canMove(x, y+1*mod, board, true, x, y) && !board[x][y+1*mod]) ||
               (canMove(x, y+2*mod, board, true, x, y) && !board[x][y+2*mod] && y === startPoint) ||
               (withinBounds(x-1, y+1*mod) && board[x-1][y+1*mod] && canMove(x-1, y+1*mod, board, true, x, y)) ||
@@ -597,7 +599,7 @@ export default function ChessBoard({ mode, setMode }) {
         for (let j = 0; j < 8; j++) {
           const piece = board[i][j];
           if (!piece || piece[1] !== opposingColor) continue;
-          if (pieceCanMove(i, j, board)) return false;
+          if (opposingPiecesCanMove(i, j, board)) return false;
         }
       }
       return true;
@@ -791,10 +793,10 @@ export default function ChessBoard({ mode, setMode }) {
           setMode(2);
           if (turn === 1) {
             setBlackWins(blackWins + 1);
-            setScoreboardAnnouncement('Black wins!');
+            setScoreboardAnnouncement('Black wins - Checkmate');
           } else {
             setWhiteWins(whiteWins + 1);
-            setScoreboardAnnouncement('White wins!');
+            setScoreboardAnnouncement('White wins! - Checkmate');
           }
         }
       } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
