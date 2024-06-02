@@ -486,8 +486,7 @@ export default function ChessBoard({ mode, setMode }) {
         // Pawn moves
         case `p${opposingColor}`:
           let mod = turn;
-          let startPoint = turn === 1 ? 1 : 6;
-          console.log(startPoint)
+          let startPoint = -turn === 1 ? 6 : 1;
           if ((canMove(x, y+1*mod, board, true, x, y) && !board[x][y+1*mod]) ||
               (canMove(x, y+2*mod, board, true, x, y) && !board[x][y+2*mod] && y === startPoint) ||
               (withinBounds(x-1, y+1*mod) && board[x-1][y+1*mod] && canMove(x-1, y+1*mod, board, true, x, y)) ||
