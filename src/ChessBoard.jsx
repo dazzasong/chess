@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
