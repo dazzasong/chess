@@ -16,7 +16,7 @@ export default function Header() {
           userSelect: 'none'
         }}
       >
-        Darren's Chess♙
+        Dazza's Chess♙
       </Typography>
     </Stack>
   );
