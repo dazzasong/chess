@@ -16,7 +16,7 @@ export default function Header() {
           userSelect: 'none'
         }}
       >
-        Dazza's Chess♙
+        Singleplayer Chess♙
       </Typography>
     </Stack>
   );
