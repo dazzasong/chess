@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { motion } from "framer-motion";
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import whitePawn from "./assets/images/chesspieces/pw.png";
@@ -54,6 +53,7 @@ function Timer(props) {
       props.timerFor === 1 ? props.setWhiteWins(props.whiteWins + 1) : props.setBlackWins(props.blackWins + 1);
       props.setScoreboardAnnouncement(props.timerFor === 1 ? "White wins - Time ran out" : "Black wins - Time ran out")
     }
+  // eslint-disable-next-line
   }, [seconds])
   return (
     <Box width={52} p={1} border='solid' borderColor={color} borderRadius={1}>
