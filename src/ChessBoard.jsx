@@ -1,36 +1,18 @@
 import React from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import CircleIcon from '@mui/icons-material/Circle';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
-import whitePawn from "./assets/images/chesspieces/pw.png";
-import whiteBishop from "./assets/images/chesspieces/bw.png";
-import whiteKnight from "./assets/images/chesspieces/nw.png"
-import whiteRook from "./assets/images/chesspieces/rw.png";
-import whiteQueen from "./assets/images/chesspieces/qw.png";
-import whiteKing from "./assets/images/chesspieces/kw.png";
-import blackPawn from "./assets/images/chesspieces/pb.png";
-import blackBishop from "./assets/images/chesspieces/bb.png";
-import blackKnight from "./assets/images/chesspieces/nb.png";
-import blackRook from "./assets/images/chesspieces/rb.png";
-import blackQueen from "./assets/images/chesspieces/qb.png";
-import blackKing from "./assets/images/chesspieces/kb.png";
-import moveAudio from "./assets/sounds/move.mp3";
-import captureAudio from "./assets/sounds/capture.mp3";
-import checkAudio from "./assets/sounds/check.mp3";
-import castleAudio from "./assets/sounds/castle.mp3";
-import promoteAudio from "./assets/sounds/promote.mp3";
-import tenSecondsAudio from "./assets/sounds/tenseconds.mp3";
+import { Circle, CircleOutlined } from "@mui/icons-material";
 
-const moveSoundEffect = new Audio(moveAudio);
-const captureSoundEffect = new Audio(captureAudio);
-const castleSoundEffect = new Audio(castleAudio);
-const checkSoundEffect = new Audio(checkAudio);
-const promoteSoundEffect = new Audio(promoteAudio);
-const tenSecondsSoundEffect = new Audio(tenSecondsAudio);
+const moveSfx = new Audio("sounds/move.mp3");
+const captureSfx = new Audio("sounds/capture.mp3");
+const castleSfx = new Audio("sounds/castle.mp3");
+const checkSfx = new Audio("sounds/check.mp3");
+const promoteSfx = new Audio("sounds/promote.mp3");
+const tenSecondsSfx = new Audio("sounds/tenseconds.mp3");
 
 function Timer(props) {
   const [seconds, setSeconds] = React.useState(600);
-  let color = seconds <= 10 ? 'red' : 'white';
+  let color = seconds <= 10 ? "red" : "white";
+
   React.useEffect(() => { // useEffect for timer
     if ((props.promotingSquare ? props.turn !== props.timerFor : props.turn === props.timerFor) && props.mode === 1) {
       const chessTimer = setInterval(() => {
@@ -40,14 +22,16 @@ function Timer(props) {
     }
   // eslint-disable-next-line
   }, [props.turn, props.mode, props.promotingSquare]);
+
   React.useEffect(() => {if (props.mode === 1) setSeconds(600)}, [props.mode]); // Resets timer on new game
   function formatTime(time) { // Formats time to minutes:seconds
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
+
   React.useEffect(() => {
-    if (seconds === 10) tenSecondsSoundEffect.play();
+    if (seconds === 10) tenSecondsSfx.play();
     else if (seconds === 0) {
       props.setMode(2);
       props.timerFor === 1 ? props.setWhiteWins(props.whiteWins + 1) : props.setBlackWins(props.blackWins + 1);
@@ -55,9 +39,10 @@ function Timer(props) {
     }
   // eslint-disable-next-line
   }, [seconds])
+
   return (
-    <Box width={52} p={1} border='solid' borderColor={color} borderRadius={1}>
-      <Typography color={color} fontSize={20} fontWeight='bold' fontFamily='Tilt Neon'>
+    <Box width={52} p={1} border="solid" borderColor={color} borderRadius={1}>
+      <Typography color={color} fontSize={20} fontWeight="bold" fontFamily="Tilt Neon">
         {formatTime(seconds)}
       </Typography>
     </Box>
@@ -67,35 +52,36 @@ function Timer(props) {
 function MoveHistory({ whiteMoves, blackMoves }) {
   function MoveBox({ move, color }) {
     return (
-      <Typography color={color} fontFamily='Tilt Neon'>
+      <Typography color={color} fontFamily="Tilt Neon">
         {move}
       </Typography>
     );
   }
+
   // Everytime either whiteMoves or blackMoves update we automatically scroll to the bottom
   React.useEffect(() => {
-    const scrollDiv = document.getElementById('moveContainer');
+    const scrollDiv = document.getElementById("moveContainer");
     scrollDiv.scrollTop = scrollDiv.scrollHeight;
   }, [whiteMoves, blackMoves]);
   return (
     <Stack
-      direction='row'
-      bgcolor='grey'
+      direction="row"
+      bgcolor="grey"
       width={120}
       height={340}
       px={1}
-      border='solid white'
-      overflow='auto'
-      id='moveContainer'
+      border="solid white"
+      overflow="auto"
+      id="moveContainer"
       sx={{
-        scrollbarWidth: 'none'
+        scrollbarWidth: "none"
       }}
     >
       <Stack width={60}>
-        {whiteMoves.map(move => <MoveBox move={move} color='white' />)}
+        {whiteMoves.map(move => <MoveBox move={move} color="white" />)}
       </Stack>
       <Stack width={60}>
-        {blackMoves.map(move => <MoveBox move={move} color='black' />)}
+        {blackMoves.map(move => <MoveBox move={move} color="black" />)}
       </Stack>
     </Stack>
   );
@@ -103,14 +89,14 @@ function MoveHistory({ whiteMoves, blackMoves }) {
 
 function SideBar(props) {
   return (
-    <Stack bgcolor='#4B4847' justifyContent='space-around' p={2}>
-      <Typography color='white' fontSize={20} height={10}>
+    <Stack bgcolor="#4B4847" justifyContent="space-around" p={2}>
+      <Typography color="white" fontSize={20} height={10}>
         {props.pointsBlack > props.pointsWhite ? `+${props.pointsBlack - props.pointsWhite}` : null}
       </Typography>
       <Timer timerFor={1} turn={props.turn} mode={props.mode} setMode={props.setMode} whiteWins={props.whiteWins} blackWins={props.blackWins} setWhiteWins={props.setWhiteWins} setBlackWins={props.setBlackWins} promotingSquare={props.promotingSquare} />
       <MoveHistory whiteMoves={props.whiteMoves} blackMoves={props.blackMoves} />
       <Timer timerFor={-1} turn={props.turn} mode={props.mode} setMode={props.setMode} whiteWins={props.whiteWins} blackWins={props.blackWins} setWhiteWins={props.setWhiteWins} setBlackWins={props.setBlackWins} promotingSquare={props.promotingSquare} />
-      <Typography color='white' fontSize={20} fontFamily='Tilt Neon' height={10}>
+      <Typography color="white" fontSize={20} fontFamily="Tilt Neon" height={10}>
         {props.pointsWhite > props.pointsBlack ? `+${props.pointsWhite - props.pointsBlack}` : null}
       </Typography>
     </Stack>
@@ -120,24 +106,24 @@ function SideBar(props) {
 function ScoreBoard({ whiteWins, blackWins, scoreboardAnnouncement }) {
   return (
     <Stack
-      direction='row'
-      justifyContent='space-around'
-      alignItems='center'
-      bgcolor='grey'
+      direction="row"
+      justifyContent="space-around"
+      alignItems="center"
+      bgcolor="grey"
       height={50}
     >
       { !scoreboardAnnouncement &&
-        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
+        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
           White: {whiteWins}
         </Typography>
       }
       { scoreboardAnnouncement &&
-        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
+        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
           {scoreboardAnnouncement}
         </Typography>
       }
       { !scoreboardAnnouncement &&
-        <Typography color='white' fontSize={24} fontFamily='Tilt Neon'>
+        <Typography color="white" fontSize={24} fontFamily="Tilt Neon">
           Black: {blackWins}
         </Typography>
       }
@@ -147,51 +133,11 @@ function ScoreBoard({ whiteWins, blackWins, scoreboardAnnouncement }) {
 
 function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
   const shaded = (x + y) % 2 === 0;
-  let src;
   let bgcolor;
-  switch (piece) {
-    case 'pw':
-      src = whitePawn;
-      break;
-    case 'bw':
-      src = whiteBishop;
-      break;
-    case 'nw':
-      src = whiteKnight;
-      break;
-    case 'rw':
-      src = whiteRook;
-      break;
-    case 'qw':
-      src = whiteQueen;
-      break;
-    case 'kw':
-      src = whiteKing;
-      break;
-    case 'pb':
-      src = blackPawn;
-      break;
-    case 'nb':
-      src = blackKnight;
-      break;
-    case 'bb':
-      src = blackBishop;
-      break;
-    case 'rb':
-      src = blackRook;
-      break;
-    case 'qb':
-      src = blackQueen;
-      break;
-    case 'kb':
-      src = blackKing;
-      break;
-    default:
-      src = null;
-  }
-  if (shaded) bgcolor = '#b58863';
-  else bgcolor = '#f0d9B5';
-  if (selected) bgcolor = '#ffff77';
+
+  if (shaded) bgcolor = "#b58863";
+  else bgcolor = "#f0d9B5";
+  if (selected) bgcolor = "#ffff77";
 
   return (
     <div onClick={() => clickSquare(x, y, selected, destinated)}>
@@ -199,32 +145,32 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
         width={64}
         height={64}
         bgcolor={bgcolor}
-        justifyContent='center'
-        position='relative'
+        justifyContent="center"
+        position="relative"
         p={0.2}
       >
-        <Typography fontWeight='bold' top={0} left={3}
+        <Typography fontWeight="bold" top={0} left={3}
           sx={{
-            position: 'absolute'
+            position: "absolute"
           }}
         >
           {x === 0 ? y + 1 : null}
         </Typography>
-        { src && 
+        { piece && 
           <Stack
             sx={{
               mr: 0.5,
-              justifyContent: 'center', alignItems: 'center',
+              justifyContent: "center", alignItems: "center",
             }}
           >
-            <img src={src} alt='Chess piece' />
+            <img src={`imgs/${piece}`} alt={piece} />
           </Stack>
         }
-        {destinated && !piece && <CircleIcon sx={{opacity: 0.2, alignSelf: 'center'}} />}
-        {destinated && piece && <CircleOutlinedIcon sx={{fontSize: 72, opacity: 0.2, alignSelf: 'center',  position: 'absolute'}} />}
-        <Typography fontWeight='bold' bottom={0} right={2}
+        {destinated && !piece && <Circle sx={{opacity: 0.2, alignSelf: "center"}} />}
+        {destinated && piece && <CircleOutlined sx={{fontSize: 72, opacity: 0.2, alignSelf: "center",  position: "absolute"}} />}
+        <Typography fontWeight="bold" bottom={0} right={2}
           sx={{
-            position: 'absolute'
+            position: "absolute"
           }}
         >
           {y === 0 ? String.fromCharCode(x + 97) : null}
@@ -236,7 +182,7 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
 
 function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare }) {
   return (
-    <Stack direction='column-reverse'>
+    <Stack direction="column-reverse">
       {Array.from(Array(8).keys()).map(y => <ChessSquare x={xAxis} y={y} piece={pieces[y]} selected={selectedY === y} destinated={destinationY.includes(y)} clickSquare={clickSquare} />)}
     </Stack>
   );
@@ -244,17 +190,17 @@ function ChessColumn({ xAxis, pieces, selectedY, destinationY = [], clickSquare 
 
 export default function ChessBoard({ mode, setMode }) {
   const initialBoard = [
-    ['rw', 'pw', null, null, null, null, 'pb', 'rb'],
-    ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
-    ['bw', 'pw', null, null, null, null, 'pb', 'bb'],
-    ['qw', 'pw', null, null, null, null, 'pb', 'qb'],
-    ['kw', 'pw', null, null, null, null, 'pb', 'kb'],
-    ['bw', 'pw', null, null, null, null, 'pb', 'bb'],
-    ['nw', 'pw', null, null, null, null, 'pb', 'nb'],
-    ['rw', 'pw', null, null, null, null, 'pb', 'rb']
+    ["rw", "pw", null, null, null, null, "pb", "rb"],
+    ["nw", "pw", null, null, null, null, "pb", "nb"],
+    ["bw", "pw", null, null, null, null, "pb", "bb"],
+    ["qw", "pw", null, null, null, null, "pb", "qb"],
+    ["kw", "pw", null, null, null, null, "pb", "kb"],
+    ["bw", "pw", null, null, null, null, "pb", "bb"],
+    ["nw", "pw", null, null, null, null, "pb", "nb"],
+    ["rw", "pw", null, null, null, null, "pb", "rb"]
   ];
   const [board, setBoard] = React.useState(initialBoard);
-  const [turn, setTurn] = React.useState(-1); // -1: White's turn || 1: Black's turn
+  const [turn, setTurn] = React.useState(-1); // -1: White"s turn || 1: Black"s turn
   const [whiteMoves, setWhiteMoves] = React.useState([]);
   const [blackMoves, setBlackMoves] = React.useState([]);
   const [pointsWhite, setPointsWhite] = React.useState(0);
@@ -269,8 +215,8 @@ export default function ChessBoard({ mode, setMode }) {
   const [promotingSquare, setPromotingSquare] = React.useState(null);
   const [enPassantSquare, setEnpassantSquare] = React.useState(null);
   const [isCheckmate, setIsCheckmate] = React.useState(0);
-  const color = turn === 1 ? 'b' : 'w';
-  const opposingColor = turn === -1 ? 'b' : 'w';
+  const color = turn === 1 ? "b" : "w";
+  const opposingColor = turn === -1 ? "b" : "w";
   React.useEffect(() => {
     if (mode === 1) { // if a new game starts
       setBoard(initialBoard);
@@ -289,7 +235,7 @@ export default function ChessBoard({ mode, setMode }) {
       setPromotingSquare(null);
       if (isCheckmate === 0) {
         turn === 1 ? setWhiteWins(whiteWins + 1) : setBlackWins(blackWins + 1);
-        setScoreboardAnnouncement(`${turn === 1 ? 'White' : 'Black'} wins - Forfeit`);
+        setScoreboardAnnouncement(`${turn === 1 ? "White" : "Black"} wins - Forfeit`);
       }
     }
   // eslint-disable-next-line
@@ -297,20 +243,20 @@ export default function ChessBoard({ mode, setMode }) {
   function addPoint(pieceTaken, opposite=false, customPoint) {
     const condition = opposite ? turn === -1 : turn === 1;
     switch (pieceTaken[0]) {
-      case 'p': // If pawn is taken...
+      case "p": // If pawn is taken...
         if (condition) setPointsBlack(pointsBlack + 1);
         else setPointsWhite(pointsWhite + 1)
         break;
-      case 'b': // If bishop or knight is taken...
-      case 'n':
+      case "b": // If bishop or knight is taken...
+      case "n":
         if (condition) setPointsBlack(pointsBlack + 3);
         else setPointsWhite(pointsWhite + 3);
         break;
-      case 'r': // If rook is taken...
+      case "r": // If rook is taken...
         if (condition) setPointsBlack(pointsBlack + 5);
         else setPointsWhite(pointsWhite + 5);
         break;
-      case 'q': // If queen is taken...
+      case "q": // If queen is taken...
         if (condition) setPointsBlack(pointsBlack + 9);
         else setPointsWhite(pointsWhite + 9);
         break;
@@ -334,7 +280,7 @@ export default function ChessBoard({ mode, setMode }) {
       case 5: return Math.min(7 - y, 7 - x);
       case 6: return Math.min(y, 7 - x);
       case 7: return Math.min(y, x);
-      default: throw new Error('Invalid direction!');
+      default: throw new Error("Invalid direction!");
     }
   }
   function PromotionCard() {
@@ -343,61 +289,64 @@ export default function ChessBoard({ mode, setMode }) {
       updatedBoard[promotingSquare[0]][promotingSquare[1]] = `${promotionPiece}${opposingColor}`;
       setBoard(updatedBoard);
       setPromotingSquare(null);
-      promoteSoundEffect.play();
+      
       switch (promotionPiece) {
-        case 'q':
+        case "q":
           addPoint(0, true, 8);
           break;
-        case 'r':
+        case "r":
           addPoint(0, true, 4);
           break;
-        case 'n':
-        case 'b':
+        case "n":
+        case "b":
           addPoint(0, true, 2);
           break;
-        default: throw new Error('Invalid promotionPiece!');
+        default: throw new Error("Invalid promotionPiece!");
       }
+
+      promoteSfx.play();
     }
+
     function promotionsrc(piece) {
       switch (piece) {
-        case 'q':
-          return turn === 1 ? whiteQueen : blackQueen;
-        case 'r':
-          return turn === 1 ? whiteRook : blackRook;
-        case 'n':
-          return turn === 1 ? whiteKnight : blackKnight;
-        case 'b':
-          return turn === 1 ? whiteBishop : blackBishop;
-        default: throw new Error('Invalid piece!');
+        case "q":
+          return turn === 1 ? "imgs/qw" : "imgs/qb";
+        case "r":
+          return turn === 1 ? "imgs/rw" : "imgs/rb";
+        case "n":
+          return turn === 1 ? "imgs/nw" : "imgs/nb";
+        case "b":
+          return turn === 1 ? "imgs/bw" : "imgs/bb";
+        default: throw new Error("Invalid piece!");
       }
     }
 
     return (
       <Stack
-        border={'solid'}
+        border={"solid"}
         p={1}
         spacing={2}
         sx={{
-          backgroundImage: 'linear-gradient(white, grey)'
+          backgroundImage: "linear-gradient(white, grey)"
         }}
       >
-        <Typography fontSize={16} fontWeight='bold'>
+        <Typography fontSize={16} fontWeight="bold">
           Promote to..
         </Typography>
-        <IconButton onClick={() => promote('q')} disableRipple>
-          <img src={promotionsrc('q')} alt={color ? 'Black Queen' : 'White Queen'} />
+        <IconButton onClick={() => promote("q")} disableRipple>
+          <img src={promotionsrc("q")} alt={color ? "Black Queen" : "White Queen"} />
         </IconButton>
         -
-        <IconButton onClick={() => promote('r')} disableRipple>
-          <img src={promotionsrc('r')} alt={color ? 'Black Rook' : 'White Rook'} />
+        <IconButton onClick={() => promote("r")} disableRipple>
+          <img src={promotionsrc("r")} alt={color ? "Black Rook" : "White Rook"} />
         </IconButton>
         -
-        <IconButton onClick={() => promote('n')} disableRipple>
-          <img src={promotionsrc('n')} alt={color ? 'Black Knight' : 'White Knight'} />
+        <IconButton onClick={() => promote("n")} disableRipple>
+          <img src={promotionsrc("n")} alt={color ? "Black Knight" : "White Knight"} />
         </IconButton>
         -
-        <IconButton onClick={() => promote('b')} disableRipple>
-          <img src={promotionsrc('b')} alt={color ? 'Black Bishop' : 'White Bishop'} />
+        <IconButton onClick={() => promote("b")} disableRipple>
+          <img src={promotionsrc("b")} alt={color ? "Black Bishop" : "White Bishop"} />
         </IconButton>
       </Stack>
     );
@@ -597,7 +546,7 @@ export default function ChessBoard({ mode, setMode }) {
               canMove(x-1, y-1, board, true, x, y)) return true;
           return false;
         default:
-          throw new Error('Invalid piece!');
+          throw new Error("Invalid piece!");
       }
     }
     function checkmated(board) {
@@ -725,16 +674,16 @@ export default function ChessBoard({ mode, setMode }) {
           if (canMove(x+1, y-1)) lst.push([x+1, y-1]);
           if (canMove(x-1, y-1)) lst.push([x-1, y-1]);
           if (turn === 1) {
-            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === 'rb') lst.push([x-2,y]);
-            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][7] && !board[6][7] && board[7][7]=== 'rb') lst.push([x+2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === -1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][7] && !board[2][7] && !board[1][7] && board[0][7] === "rb") lst.push([x-2,y]);
+            if ((castleStateBlack === 0 || castleStateBlack === 1) && x === 4 && y === 7 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][7] && !board[6][7] && board[7][7]=== "rb") lst.push([x+2,y]);
           } else {
-            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === 'rw') lst.push([x-2,y]);
-            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][0] && !board[6][0] && board[7][0] === 'rw') lst.push([x+2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === -1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x-1, y) && canMove(x-2, y) && !board[3][0] && !board[2][0] && !board[1][0] && board[0][0] === "rw") lst.push([x-2,y]);
+            if ((castleStateWhite === 0 || castleStateWhite === 1) && x === 4 && y === 0 && !kingInCheck(board) && canMove(x+1, y) && canMove(x+2, y) && !board[5][0] && !board[6][0] && board[7][0] === "rw") lst.push([x+2,y]);
           }
           setDestinationSquares(lst);
           break;
         default:
-          throw new Error('Invalid piece!');
+          throw new Error("Invalid piece!");
       }
     } else if (destinated) { // If the clicked square is destinated...
       const selectedPiece = board[selectedSquare[0]][selectedSquare[1]];
@@ -745,7 +694,7 @@ export default function ChessBoard({ mode, setMode }) {
         else turn === 1 ? blackMove += notation : whiteMove += notation;
       }
       if (selectedPiece !== `p${color}`) editMove(selectedPiece[0].toUpperCase());
-      if (board[x][y]) editMove('x');
+      if (board[x][y]) editMove("x");
       editMove(String.fromCharCode(x + 97));
       editMove(y + 1);
       // Setting states for castling
@@ -782,34 +731,34 @@ export default function ChessBoard({ mode, setMode }) {
           updatedBoard[x+1][y] = updatedBoard[0][y];
           updatedBoard[0][y] = null;
           castle = true;
-          editMove('0-0-0', true);
+          editMove("0-0-0", true);
         } else if (x === selectedSquare[0] + 2) {
           updatedBoard[x-1][y] = updatedBoard[0][y];
           updatedBoard[7][y] = null;
           castle = true;
-          editMove('0-0', true);
+          editMove("0-0", true);
         }
       }
       else if (selectedPiece === `p${color}` && y === (turn === 1 ? 0 : 7)) setPromotingSquare([x, y]); // Checks for promotion
       if (kingInCheck(updatedBoard, true)) { // If opposing king is in check...
-        checkSoundEffect.play();
-        if (!checkmated(updatedBoard)) editMove('+');
+        checkSfx.play();
+        if (!checkmated(updatedBoard)) editMove("+");
         else {
-          editMove('#');
+          editMove("#");
           setMode(2);
           turn === 1 ? setBlackWins(blackWins + 1) : setWhiteWins(whiteWins + 1);
-          turn === 1 ? setScoreboardAnnouncement('Black wins - Checkmate') : setScoreboardAnnouncement('White wins! - Checkmate');
+          turn === 1 ? setScoreboardAnnouncement("Black wins - Checkmate") : setScoreboardAnnouncement("White wins! - Checkmate");
           setIsCheckmate(1);
         }
-      } else if (castle) castleSoundEffect.play(); // Plays castleSoundEffect if move is castling
+      } else if (castle) castleSfx.play(); // Plays castleSfx if move is castling
       else if (selectedPiece === `p${color}` && !board[x][y] && (x === selectedSquare[0] - 1 || x === selectedSquare[0] + 1)) { // Checks for en passant
         updatedBoard[enPassantSquare[0]][enPassantSquare[1]] = null;
-        addPoint('p');
-        captureSoundEffect.play();
-      } else if (!board[x][y]) moveSoundEffect.play(); // Plays moveSoundEffect if destination square has no piece
-      else if (board[x][y]) { // Adds points and plays captureSoundEffect if destination square has an enemy piece
+        addPoint("p");
+        captureSfx.play();
+      } else if (!board[x][y]) moveSfx.play(); // Plays moveSfx if destination square has no piece
+      else if (board[x][y]) { // Adds points and plays captureSfx if destination square has an enemy piece
         addPoint(board[x][y]);
-        captureSoundEffect.play();
+        captureSfx.play();
       }
       // Sets board state to updated board and switches turn
       setBoard(updatedBoard);
@@ -828,12 +777,12 @@ export default function ChessBoard({ mode, setMode }) {
   for (let x = 0; x < 8; x++) for (let coordinate in destinationSquares) if (destinationSquares[coordinate][0] === x) destinationColumns[x].push(destinationSquares[coordinate][1]); // pushes the Y coords of each array to destinationColumns and highlightedColumns in the correct indexes
 
   return (
-    <Stack direction='row' sx={{ userSelect: 'none' }}
+    <Stack direction="row" sx={{ userSelect: "none" }}
     >
       {promotingSquare && <PromotionCard />}
       <Box>
         <ScoreBoard whiteWins={whiteWins} blackWins={blackWins} scoreboardAnnouncement={scoreboardAnnouncement} />
-        <Stack direction='row' boxShadow={10}>
+        <Stack direction="row" boxShadow={10}>
           {Array.from(Array(8).keys()).map(x => <ChessColumn xAxis={x} pieces={board[x]} selectedY={x === selectedSquare?.[0] ? selectedSquare[1] : null} destinationY={destinationColumns[x]} clickSquare={clickSquare} />)}
         </Stack>
       </Box>
