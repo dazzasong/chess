@@ -163,7 +163,7 @@ function ChessSquare({ x, y, piece, selected, destinated, clickSquare }) {
               justifyContent: "center", alignItems: "center",
             }}
           >
-            <img src={`imgs/${piece}`} alt={piece} />
+            <img src={`imgs/${piece}.png`} alt={piece} />
           </Stack>
         }
         {destinated && !piece && <Circle sx={{opacity: 0.2, alignSelf: "center"}} />}
@@ -266,11 +266,8 @@ export default function ChessBoard({ mode, setMode }) {
     }
   }
   function spacesLen(x, y, direction) {
-    /*
-    Directions:
-    0 = up, 1 = right, 2 = down, 3 = left,
-    4 = topLeft, 5 = topRight, 6 = bottomRight, 7 = bottomLeft
-    */
+    // Directions:
+    // 0 = up, 1 = right, 2 = down, 3 = left, 4 = topLeft, 5 = topRight, 6 = bottomRight, 7 = bottomLeft
     switch (direction) {
       case 0: return 7 - y;
       case 1: return 7 - x;
@@ -303,7 +300,6 @@ export default function ChessBoard({ mode, setMode }) {
           break;
         default: throw new Error("Invalid promotionPiece!");
       }
-
       promoteSfx.play();
     }
 
@@ -354,11 +350,13 @@ export default function ChessBoard({ mode, setMode }) {
   function clickSquare(x, y, selected, destinated) { // function when a square is clicked
     // Checks if move is within bounds
     const withinBounds = (x, y) => x >= 0 && x <= 7 && y >= 0 && y <= 7;
+
     // Fundamentally canMove but does not consider king in check conditions
     function canPotentialMove(toX, toY, board, opposing=false) {
       const c = opposing ? opposingColor : color
       return withinBounds(toX, toY) && board[toX][toY]?.[1] !== c;
     }
+
     function canMove(toX, toY, curBoard=board, opposing=false, fromX=x, fromY=y) {
       if (!canPotentialMove(toX, toY, curBoard, opposing)) return false;
       // Now check if king is in check
@@ -367,6 +365,7 @@ export default function ChessBoard({ mode, setMode }) {
       tempBoard[fromX][fromY] = null;
       return !kingInCheck(tempBoard, opposing);
     }
+
     function kingInCheck(board, opposing=false) {
       let kingX, kingY;
       for (let i = 0; i < 8; i++) {
@@ -377,12 +376,16 @@ export default function ChessBoard({ mode, setMode }) {
           }
         }
       }
+
       const usedColor = opposing ? color : opposingColor;
+      
       // We want to test if any opposing pieces are able to capture the king in the current board state.
       const kicTurn = opposing ? -turn : turn;
+      
       // Pawn
       if ((canPotentialMove(kingX-1, kingY-kicTurn, board, opposing) && board[kingX-1][kingY-kicTurn] === `p${usedColor}`) ||
           (canPotentialMove(kingX+1, kingY-kicTurn, board, opposing) && board[kingX+1][kingY-kicTurn] === `p${usedColor}`)) return true;
+      
       // Knight
       if ((canPotentialMove(kingX-1, kingY+2, board, opposing) && board[kingX-1][kingY+2] === `n${usedColor}`) ||
           (canPotentialMove(kingX+1, kingY+2, board, opposing) && board[kingX+1][kingY+2] === `n${usedColor}`) ||
@@ -392,6 +395,7 @@ export default function ChessBoard({ mode, setMode }) {
           (canPotentialMove(kingX-1, kingY-2, board, opposing) && board[kingX-1][kingY-2] === `n${usedColor}`) ||
           (canPotentialMove(kingX-2, kingY-1, board, opposing) && board[kingX-2][kingY-1] === `n${usedColor}`) ||
           (canPotentialMove(kingX-2, kingY+1, board, opposing) && board[kingX-2][kingY+1] === `n${usedColor}`)) return true;
+      
       // Bishop, Rook, and Queen
       for (let i = 1; i <= spacesLen(kingX, kingY, 4); i++) {
         if (board[kingX-i][kingY+i] === `b${usedColor}` || board[kingX-i][kingY+i] === `q${usedColor}`) return true;
@@ -425,6 +429,7 @@ export default function ChessBoard({ mode, setMode }) {
         if (board[kingX-i][kingY] === `r${usedColor}` || board[kingX-i][kingY] === `q${usedColor}`) return true;
         if (board[kingX-i][kingY]) break;
       }
+
       // King
       if ((canPotentialMove(kingX, kingY+1, board, opposing) && board[kingX][kingY+1] === `k${usedColor}`) ||
           (canPotentialMove(kingX+1, kingY, board, opposing) && board[kingX+1][kingY] === `k${usedColor}`) ||
